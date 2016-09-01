@@ -13,6 +13,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+//        let viewPager = ViewPager(controllers: [ArtistViewController(), UIViewController()],
+//                                  parentViewController: self)
+//        self.view.addSubview(viewPager.view)
+        
+        let viewpager = ViewPager2(controllers: [ArtistViewController(), PlayListViewController(), AlbumViewController(), SampleViewController()], parentViewController: self)
+        self.view.addSubview(viewpager.view)
     }
 
     override func didReceiveMemoryWarning() {
