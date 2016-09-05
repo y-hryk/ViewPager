@@ -11,6 +11,8 @@ import UIKit
 
 public class MenuView: UIView {
     
+    var indicatorView: UIView!
+    private let factor: CGFloat = 4
     private var itemsWidth: CGFloat = 0.0
     private var collectionView : UICollectionView!
 
@@ -38,11 +40,28 @@ public class MenuView: UIView {
         self.collectionView.alwaysBounceHorizontal = true
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
-        
-//        self.collectionView.factor = 3
         self.addSubview(collectionView)
+        
+        indicatorView = UIView()
+        indicatorView.frame = CGRectMake(0, self.frame.height - 2, 80, 2)
+        indicatorView.backgroundColor = UIColor.blueColor()
+        self.addSubview(indicatorView)
+        
+        
+        self.collectionView.translatesAutoresizingMaskIntoConstraints = false
+        self.addConstraints([
+            NSLayoutConstraint(item: self.collectionView, attribute: .Top, relatedBy: .Equal, toItem: self, attribute: .Top, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: self.collectionView, attribute: .Leading, relatedBy: .Equal, toItem: self, attribute: .Leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.collectionView, attribute: .Trailing, relatedBy: .Equal, toItem: self, attribute: .Trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.collectionView, attribute: .Bottom, relatedBy: .Equal, toItem: self, attribute: .Bottom, multiplier: 1.0, constant: 0)
+        ])
     }
-
+    
+    
+    // MARK: Public
+    public func moveIndicator() {
+        
+    }
 }
 
 // MARK: UICollectionViewDataSource
@@ -53,7 +72,7 @@ extension MenuView : UICollectionViewDataSource {
     }
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5 * 3
+        return 5 * Int(factor)
     }
     
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -75,7 +94,7 @@ extension MenuView: UICollectionViewDelegate {
     public func scrollViewDidScroll(scrollView: UIScrollView) {
         
         if itemsWidth == 0.0 {
-            itemsWidth = floor(scrollView.contentSize.width / 3.0)
+            itemsWidth = floor(scrollView.contentSize.width / factor)
         }
         
         if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > itemsWidth * 2.0) {

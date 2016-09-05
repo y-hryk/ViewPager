@@ -15,19 +15,69 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView = UITableView(frame: self.view.frame, style: .Plain)
-        tableView.delegate = self
-        tableView.dataSource = self
+        self.tableView = UITableView(frame: self.view.frame, style: .Plain)
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.backgroundColor = UIColor.orangeColor()
         self.view.addSubview(tableView)
         
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
 
         // Do any additional setup after loading the view.
+        self.tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        self.view.addConstraints([
+            // Top
+            NSLayoutConstraint(
+                item: self.tableView,
+                attribute: .Top,
+                relatedBy: .Equal,
+                toItem: topLayoutGuide,
+                attribute: .Bottom,
+                multiplier: 1.0,
+                constant: 0
+            ),
+
+            // Left
+            NSLayoutConstraint(
+                item: self.tableView,
+                attribute: .Leading,
+                relatedBy: .Equal,
+                toItem: self.view,
+                attribute: .Leading,
+                multiplier: 1.0,
+                constant: 0
+            ),
+            
+            // right
+            NSLayoutConstraint(
+                item: self.tableView,
+                attribute: .Trailing,
+                relatedBy: .Equal,
+                toItem: self.view,
+                attribute: .Trailing,
+                multiplier: 1.0,
+                constant: 0
+            ),
+            
+            // bottom
+            NSLayoutConstraint(
+                item: self.tableView,
+                attribute: .Bottom,
+                relatedBy: .Equal,
+                toItem: self.view,
+                attribute: .Bottom,
+                multiplier: 1.0,
+                constant: 0
+            )
+            ]
+        )
     }
     
     override func viewDidLayoutSubviews() {
         print("viewDidLayoutSubviews")
-        tableView.frame = self.view.frame
+//        tableView.frame = self.view.frame
     }
     
 

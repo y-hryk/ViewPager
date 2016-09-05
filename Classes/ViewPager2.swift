@@ -72,6 +72,25 @@ public class ViewPager2: UIViewController {
                 scrollView.delegate = self
             }
         }
+        
+        
+        // layout pageController
+        self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addConstraints([
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 40),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0)
+        ])
+        
+        // layout menuView
+        self.menuView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addConstraints([
+            NSLayoutConstraint(item: self.menuView, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 40)
+        ])
     }
     
     // MARK: Private
@@ -148,6 +167,31 @@ extension ViewPager2: UIPageViewControllerDataSource {
 extension ViewPager2: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
-        print(scrollView.contentOffset.x)
+        if scrollView.contentOffset.x == self.view.frame.width {
+            return
+        }
+//        print(scrollView.contentOffset.x)
+//        let itemWidth = 80
+//        let ratio = scrollView.frame.size.width
+        
+        // nextViewController Index
+        var targetIndex = 0
+        if scrollView.contentOffset.x > self.view.frame.width {
+            targetIndex = currentIndex + 1
+        } else {
+            targetIndex = currentIndex - 1
+        }
+        
+        // infinity setting
+        if targetIndex == viewControllers.count {
+            targetIndex = 0
+        }
+        
+        if targetIndex < 0 {
+            targetIndex = viewControllers.count - 1
+        }
+        
+
+        print(targetIndex)
     }
 }

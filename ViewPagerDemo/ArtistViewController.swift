@@ -15,9 +15,6 @@ class ArtistViewController: UITableViewController {
         
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
         
-//        let navigationHeight = topLayoutGuide.length ?? 0.0
-        
-       
     }
     
     override func viewDidAppear(animated: Bool) {
