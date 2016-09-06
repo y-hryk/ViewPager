@@ -28,7 +28,7 @@ public class MenuCell: UICollectionViewCell {
 //        label.frame = CGRectMake(0, 0, self.frame.width, 40)
         label.font = UIFont.systemFontOfSize(15)
         label.textColor = UIColor.blackColor()
-//        label.textAlignment = .Center
+        label.textAlignment = .Center
 //        label.lineBreakMode = .ByWordWrapping
         self.label.backgroundColor = UIColor.clearColor()
         self.contentView.addSubview(label)
@@ -53,7 +53,7 @@ public class MenuCell: UICollectionViewCell {
         
 //        let width = MenuCell.cellWidth(text, font: UIFont.systemFontOfSize(15))
 //        label.frame = CGRectMake(0, 0, width, 40)
-        print(self.frame.size.width)
+//        print(self.frame.size.width)
 
         
     }
@@ -78,8 +78,8 @@ public class MenuCell: UICollectionViewCell {
                                                     attributes: attributes,
                                                     context: nil)
 //        let width = max(frame.width + 10 + 10,80)
-        
-        return frame.width + 30
+        return 100
+//        return CGFloat(Int(frame.width) + 30)
     }
 }
 

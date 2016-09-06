@@ -76,7 +76,7 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     override func viewDidLayoutSubviews() {
-        print("viewDidLayoutSubviews")
+//        print("viewDidLayoutSubviews")
 //        tableView.frame = self.view.frame
     }
     

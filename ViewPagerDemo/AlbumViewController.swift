@@ -13,11 +13,6 @@ class AlbumViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-  
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.orangeColor()
         
         let label = UILabel()
@@ -31,6 +26,12 @@ class AlbumViewController: UIViewController {
         view.frame = CGRectMake(0, self.view.frame.height - 50, 200, 50)
         view.backgroundColor = UIColor.redColor()
         self.view.addSubview(view)
+  
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        // Do any additional setup after loading the view.
+ 
     }
 
     override func didReceiveMemoryWarning() {
