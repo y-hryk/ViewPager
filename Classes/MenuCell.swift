@@ -11,6 +11,7 @@ import UIKit
 public class MenuCell: UICollectionViewCell {
     
     private var label: UILabel!
+    private var view: UIView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,11 +30,11 @@ public class MenuCell: UICollectionViewCell {
         label.font = UIFont.systemFontOfSize(15)
         label.textColor = UIColor.blackColor()
         label.textAlignment = .Center
-//        label.lineBreakMode = .ByWordWrapping
-        self.label.backgroundColor = UIColor.clearColor()
+        label.lineBreakMode = .ByWordWrapping
+        self.label.backgroundColor = UIColor.whiteColor()
         self.contentView.addSubview(label)
         
-        // label layout
+    
         label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
             NSLayoutConstraint(item: label, attribute: .Top, relatedBy: .Equal, toItem: self.contentView, attribute: .Top, multiplier:1.0, constant: 0),
@@ -50,6 +51,8 @@ public class MenuCell: UICollectionViewCell {
         }
         
         label.text = "\(text)" + "\(indexPath.row)"
+        print(self.contentView.frame.width)
+//        view.frame = CGRectMake(self.contentView.frame.width - 2, 0, 2, self.contentView.frame.height)
         
 //        let width = MenuCell.cellWidth(text, font: UIFont.systemFontOfSize(15))
 //        label.frame = CGRectMake(0, 0, width, 40)
@@ -62,8 +65,8 @@ public class MenuCell: UICollectionViewCell {
 //        CGSize maxSize = CGSizeMake(CGFloat.max, 40);
         
         let style = NSMutableParagraphStyle()
-//        style.alignment = .Center
-//        style.lineBreakMode = .ByWordWrapping
+        style.alignment = .Center
+        style.lineBreakMode = .ByWordWrapping
         
         let attributes =  [NSFontAttributeName : font,
                            NSParagraphStyleAttributeName : style]
@@ -78,7 +81,8 @@ public class MenuCell: UICollectionViewCell {
                                                     attributes: attributes,
                                                     context: nil)
 //        let width = max(frame.width + 10 + 10,80)
-        return 100
+//        return 100
+        return frame.width + 30
 //        return CGFloat(Int(frame.width) + 30)
     }
 }

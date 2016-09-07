@@ -14,12 +14,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-//        let viewPager = ViewPager(controllers: [ArtistViewController(), UIViewController()],
-//                                  parentViewController: self)
-//        self.view.addSubview(viewPager.view)
-        
         let viewpager = ViewPager(controllers: [ArtistViewController(), PlayListViewController(), AlbumViewController(), SampleViewController()], parentViewController: self)
         self.view.addSubview(viewpager.view)
+        
+//        self.addChildViewController(viewpager)
+//        //        parentViewController.automaticallyAdjustsScrollViewInsets = false
+//        viewpager.didMoveToParentViewController(self)
     }
 
     override func didReceiveMemoryWarning() {

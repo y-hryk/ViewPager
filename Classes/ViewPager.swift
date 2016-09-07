@@ -16,6 +16,7 @@ public class ViewPager: UIViewController {
         }
         return self.viewControllers.map{ $0 }.indexOf(viewController)
     }
+    var movingIndex: Int = 0
     private var pageViewController: UIPageViewController!
     private var menuView: MenuView!
     private var titles = [String]()
@@ -29,7 +30,7 @@ public class ViewPager: UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         viewControllers = controllers
-        //
+//        //
         parentViewController.addChildViewController(self)
 //        parentViewController.automaticallyAdjustsScrollViewInsets = false
         self.didMoveToParentViewController(parentViewController)
@@ -45,7 +46,7 @@ public class ViewPager: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.automaticallyAdjustsScrollViewInsets = false
+//        self.automaticallyAdjustsScrollViewInsets = false
         
         self.pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
         self.pageViewController.dataSource = self
@@ -56,34 +57,34 @@ public class ViewPager: UIViewController {
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
         
-        for controller in viewControllers {
-            controller.view.frame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height - (64 + 40))
-        }
-//
-        for controller in viewControllers {
-            NSLog("\(controller.view.frame)")
-        }
         
+//        for controller in viewControllers {
+//            controller.view.frame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height - (64 + 40))
+//        }
+
+        self.movingIndex = 0
         self.pageViewController.setViewControllers([viewControllers[0]], direction: .Forward, animated: true, completion: nil)
         
-//        self.controllerInset()
+        self.controllerInset()
         
         menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
+//        menuView = MenuView()
         menuView.backgroundColor = UIColor.clearColor()
 //        menuView.alpha = 0.3
         self.view.addSubview(menuView)
         
         for view in self.pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
+                scrollView.scrollsToTop = false
                 scrollView.delegate = self
             }
         }
         
-        
         // layout pageController
         self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
         self.view.addConstraints([
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 40),
+//            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier:1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0)
@@ -106,25 +107,25 @@ public class ViewPager: UIViewController {
         
         for controller in viewControllers {
             if let controller = controller as? UITableViewController {
-                controller.tableView.contentInset.top = 64 + 50
+                controller.tableView.contentInset.top = 64 + 40
                 continue
             }
             if let controller = controller as? UICollectionViewController {
-                controller.collectionView!.contentInset.top = 64 + 50
+                controller.collectionView!.contentInset.top = 64 + 40
                 continue
             }
             
             for view in controller.view.subviews {
                 if let view = view as? UITableView {
-                    view.contentInset.top = 64 + 50
+                    view.contentInset.top = 64 + 40
                     break
                 }
                 if let view = view as? UICollectionView {
-                    view.contentInset.top = 64 + 50
+                    view.contentInset.top = 64 + 40
                     break
                 }
                 if let view = view as? UIScrollView {
-                    view.contentInset.top = 64 + 50
+                    view.contentInset.top = 64 + 40
                     break
                 }
             }
@@ -153,6 +154,7 @@ extension ViewPager: UIPageViewControllerDataSource {
             index = viewControllers.count - 1
         } else if index == viewControllers.count {
             index = 0
+            
         }
         
         if index >= 0 && index < viewControllers.count {
@@ -187,8 +189,9 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        self.menuView.updateCurrentIndex(index: currentIndex)
 //        print("didFinishAnimating")
 //        print("currentIndex : \(self.currentIndex)")
-        
+        self.movingIndex = self.currentIndex!
         self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+        
     }
 }
 
@@ -208,9 +211,9 @@ extension ViewPager: UIScrollViewDelegate {
         
         var targetIndex = 0
         if scrollView.contentOffset.x > self.view.frame.width {
-            targetIndex = self.currentIndex! + 1
+            targetIndex = self.movingIndex + 1
         } else {
-            targetIndex = self.currentIndex! - 1
+            targetIndex = self.movingIndex - 1
         }
         
         // infinity setting
@@ -222,8 +225,10 @@ extension ViewPager: UIScrollViewDelegate {
             targetIndex = viewControllers.count - 1
         }
         
-        let offsetX = fabs(scrollView.contentOffset.x - self.view.frame.width)
-        self.menuView.moveIndicator(currentIndex: self.currentIndex!, nextIndex: targetIndex, offsetX: offsetX)
+        print("self.currentIndex : \(self.movingIndex)")
+        print("targetIndex : \(targetIndex)")
+        let offsetX = scrollView.contentOffset.x - self.view.frame.width
+        self.menuView.moveIndicator(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
 
 //        print(targetIndex)
 //        print(scrollView.contentOffset.x)

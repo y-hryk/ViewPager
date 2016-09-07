@@ -34,7 +34,6 @@ public class MenuView: UIView {
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .Horizontal
-        
         self.collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: layout)
         self.collectionView.backgroundColor = UIColor.clearColor()
         self.collectionView.registerClass(MenuCell.self, forCellWithReuseIdentifier: "MenuCell")
@@ -42,10 +41,10 @@ public class MenuView: UIView {
         self.collectionView.alwaysBounceHorizontal = true
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
+        self.collectionView.scrollsToTop = false
         self.addSubview(self.collectionView)
         
         let shadowView = UIView()
-//        shadowView.frame = CGRectMake(0, self.frame.height - 0.5, self.frame.width, 0.5)
         shadowView.backgroundColor = UIColor.lightGrayColor()
         self.addSubview(shadowView)
         
@@ -53,6 +52,7 @@ public class MenuView: UIView {
         self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (80 / 2), self.frame.height - 2, 80, 2)
         self.indicatorView.backgroundColor = UIColor.blueColor()
         self.addSubview(self.indicatorView)
+        
         
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
@@ -62,7 +62,6 @@ public class MenuView: UIView {
             NSLayoutConstraint(item: self.collectionView, attribute: .Bottom, relatedBy: .Equal, toItem: self, attribute: .Bottom, multiplier: 1.0, constant: 0)
         ])
         
-        // layout shadowView
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
             NSLayoutConstraint(item: shadowView, attribute: .Leading, relatedBy: .Equal, toItem: self, attribute: .Leading, multiplier: 1.0, constant: 0),
@@ -72,19 +71,10 @@ public class MenuView: UIView {
         ])
         
         self.titles = ["artistartistartistartist","album","playlist","sample"]
-        
     }
     
     
     // MARK: Public
-    
-    public func updateCurrentIndex(index index: Int) {
-        currentIndex = index + self.titles.count
-        print("currentIndex: \(currentIndex)")
-        let indexPath = NSIndexPath(forItem: currentIndex, inSection: 0)
-//        self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: true)
-        
-    }
     
     public func scrollToMenuItemAtIndex(index index: Int) {
         currentIndex = index + self.titles.count
@@ -92,11 +82,10 @@ public class MenuView: UIView {
         let indexPath = NSIndexPath(forItem: currentIndex, inSection: 0)
         self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: false)
         self.currentOffsetX = self.collectionView.contentOffset.x
-    }
     
-    public func moveIndicator(currentIndex currentIndex: Int) {
-        var nextIndex = currentIndex + self.titles.count
-  
+        let itemWidth = MenuCell.cellWidth(self.titles[index], font: UIFont.systemFontOfSize(15))
+        self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (itemWidth / 2), self.frame.height - 2, itemWidth, 2)
+        print("------------------ \(self.currentOffsetX)")
     }
     
     public func moveIndicator(currentIndex currentIndex: Int, nextIndex: Int, offsetX: CGFloat) {
@@ -107,30 +96,18 @@ public class MenuView: UIView {
 //        print("currentItemWidth : \(currentItemWidth)")
 //        print("nextItemWidth : \(nextItemWidth)")
         
-        let diff = max(currentItemWidth, nextItemWidth) - min(currentItemWidth, nextItemWidth)
-        
-        
-//        let itemWidth = (self.frame.width / diff) * offsetX
-        let scrollDiff = offsetX / self.frame.width
-//        let itemWidth = nextItemWidth * scrollDiff
-        
-        let width = fabs(scrollDiff) * (nextItemWidth - currentItemWidth)
-        let itemWidth = currentItemWidth + width
-//        self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (itemWidth / 2), self.frame.height - 2, itemWidth, 2)
-//        print("itemWidth : \(currentItemWidth + width)")
-        
-        let distance = (currentItemWidth / 2.0) + (nextItemWidth / 2.0)
-        let scroll = scrollDiff * distance
-        print(collectionView.contentOffset.x)
-        collectionView.contentOffset.x = self.currentOffsetX + scroll
-        
-//        if currentItemWidth > nextItemWidth {
-//            
-//            print("itemWidth : \(max(currentItemWidth, itemWidth))")
-//        } else {
-//            
+//        if self.currentOffsetX == 0 {
+//            self.currentOffsetX = self.collectionView.contentOffset.x
 //        }
         
+        let diff = offsetX / self.frame.width
+        let diffWidth = fabs(diff) * (nextItemWidth - currentItemWidth)
+        let itemWidth = currentItemWidth + diffWidth
+        self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (itemWidth / 2), self.frame.height - 2, itemWidth, 2)
+        let itemOffetX = (currentItemWidth / 2.0) + (nextItemWidth / 2.0)
+        
+        let scrollOffsetX = diff * itemOffetX
+        self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX
     }
 }
 
