@@ -21,6 +21,7 @@ public class ViewPager: UIViewController {
     private var menuView: MenuView!
     private var titles = [String]()
     private var viewControllers = [UIViewController]()
+    private var shouldScrollCurrentBar = false
     
     override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -108,22 +109,24 @@ public class ViewPager: UIViewController {
         for controller in viewControllers {
             if let controller = controller as? UITableViewController {
                 controller.tableView.contentInset.top = 64 + 40
+                controller.tableView.contentOffset.y = 64 + 40
                 continue
             }
             if let controller = controller as? UICollectionViewController {
                 controller.collectionView!.contentInset.top = 64 + 40
+                controller.collectionView!.contentOffset.y = 64 + 40
                 continue
             }
             
             for view in controller.view.subviews {
-                if let view = view as? UITableView {
-                    view.contentInset.top = 64 + 40
-                    break
-                }
-                if let view = view as? UICollectionView {
-                    view.contentInset.top = 64 + 40
-                    break
-                }
+//                if let view = view as? UITableView {
+//                    view.contentInset.top = 64 + 40
+//                    break
+//                }
+//                if let view = view as? UICollectionView {
+//                    view.contentInset.top = 64 + 40
+//                    break
+//                }
                 if let view = view as? UIScrollView {
                     view.contentInset.top = 64 + 40
                     break
@@ -180,6 +183,7 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        print("willTransitionToViewControllers")
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
+        self.shouldScrollCurrentBar = true
         
     }
     
@@ -189,9 +193,14 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        self.menuView.updateCurrentIndex(index: currentIndex)
 //        print("didFinishAnimating")
 //        print("currentIndex : \(self.currentIndex)")
+        
+//        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
+//        if completed {
+//            print("YESSSSSSSSSSSSSSS")
+//        }
+
         self.movingIndex = self.currentIndex!
         self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
-        
     }
 }
 
@@ -200,7 +209,10 @@ extension ViewPager: UIPageViewControllerDelegate {
 extension ViewPager: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
-        if scrollView.contentOffset.x == self.view.frame.width {
+//        if (self.isDrag) {
+//            return;
+//        }
+        if scrollView.contentOffset.x == self.view.frame.width || !self.shouldScrollCurrentBar {
             return
         }
 //        print(scrollView.contentOffset.x)
@@ -225,12 +237,30 @@ extension ViewPager: UIScrollViewDelegate {
             targetIndex = viewControllers.count - 1
         }
         
-        print("self.currentIndex : \(self.movingIndex)")
-        print("targetIndex : \(targetIndex)")
+//        print("self.currentIndex : \(self.movingIndex)")
+//        print("targetIndex : \(targetIndex)")
         let offsetX = scrollView.contentOffset.x - self.view.frame.width
         self.menuView.moveIndicator(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
 
 //        print(targetIndex)
 //        print(scrollView.contentOffset.x)
     }
+    
+    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+//        self.isDrag = false
+//        print("----------------- end")
+//        self.movingIndex = self.currentIndex!
+//        //        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+//        
+////        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
+//        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+        
+//        self.movingIndex = self.currentIndex!
+//        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
+//        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
+    }
+    
 }

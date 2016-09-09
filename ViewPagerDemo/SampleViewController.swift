@@ -11,7 +11,16 @@ import UIKit
 class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var tableView: UITableView!
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.scrollsToTop = true
+    }
     
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        tableView.scrollsToTop = false
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         

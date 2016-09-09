@@ -82,10 +82,13 @@ public class MenuView: UIView {
         let indexPath = NSIndexPath(forItem: currentIndex, inSection: 0)
         self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: false)
         self.currentOffsetX = self.collectionView.contentOffset.x
-    
         let itemWidth = MenuCell.cellWidth(self.titles[index], font: UIFont.systemFontOfSize(15))
         self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (itemWidth / 2), self.frame.height - 2, itemWidth, 2)
-        print("------------------ \(self.currentOffsetX)")
+//        print("------------------ \(self.currentOffsetX)")
+    }
+    
+    public func updateMenuScrollPosition(index index: Int) {
+       self.currentOffsetX = self.collectionView.contentOffset.x
     }
     
     public func moveIndicator(currentIndex currentIndex: Int, nextIndex: Int, offsetX: CGFloat) {
@@ -108,6 +111,11 @@ public class MenuView: UIView {
         
         let scrollOffsetX = diff * itemOffetX
         self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX
+        
+        //
+//        if self.collectionView.contentOffset.x >= self.currentOffsetX + itemOffetX {
+//            self.scrollToMenuItemAtIndex(index: currentIndex)
+//        }
     }
 }
 

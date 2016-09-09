@@ -20,6 +20,16 @@ class ArtistViewController: UITableViewController {
     override func viewDidAppear(animated: Bool) {
 //         NSLog("\(tableView.contentInset)")
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.scrollsToTop = true
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        tableView.scrollsToTop = false
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
