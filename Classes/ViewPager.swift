@@ -10,6 +10,7 @@ import UIKit
 
 public class ViewPager: UIViewController {
     
+    private var option = ViewPagerOption()
     var currentIndex: Int? {
         guard let viewController = self.pageViewController.viewControllers?.first else {
             return 0
@@ -21,20 +22,27 @@ public class ViewPager: UIViewController {
     private var menuView: MenuView!
     private var titles = [String]()
     private var viewControllers = [UIViewController]()
-    private var shouldScrollCurrentBar = false
     
     override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    init(controllers: [UIViewController], parentViewController: ViewController) {
+    init(controllers: [UIViewController], option: ViewPagerOption, parentViewController: ViewController) {
         super.init(nibName: nil, bundle: nil)
         
-        viewControllers = controllers
-//        //
         parentViewController.addChildViewController(self)
-//        parentViewController.automaticallyAdjustsScrollViewInsets = false
         self.didMoveToParentViewController(parentViewController)
+        
+        self.viewControllers = controllers
+        // titles
+        controllers.forEach {
+            guard let title = $0.title else {
+                fatalError("Please set the title of the viewController")
+            }
+            self.titles.append(title)
+        }
+        self.option = option
+//        parentViewController.automaticallyAdjustsScrollViewInsets = false
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -53,7 +61,7 @@ public class ViewPager: UIViewController {
         self.pageViewController.dataSource = self
         self.pageViewController.delegate = self
         
-        self.pageViewController.view.frame = CGRectMake(0, (64 + 40), self.view.frame.width, self.view.frame.height - (64 + 40))
+//        self.pageViewController.view.frame = CGRectMake(0, (64 + 40), self.view.frame.width, self.view.frame.height - (64 + 40))
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMoveToParentViewController(self)
@@ -68,8 +76,8 @@ public class ViewPager: UIViewController {
         
         self.controllerInset()
         
-        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
-//        menuView = MenuView()
+//        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
+        menuView = MenuView(titles: self.titles, option: self.option)
         menuView.backgroundColor = UIColor.clearColor()
 //        menuView.alpha = 0.3
         self.view.addSubview(menuView)
@@ -99,8 +107,6 @@ public class ViewPager: UIViewController {
             NSLayoutConstraint(item: self.menuView, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.menuView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 40)
         ])
-        
-        self.titles = ["artistartistartistartist","album","playlist","sample"]
     }
     
     // MARK: Private
@@ -183,8 +189,6 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        print("willTransitionToViewControllers")
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
-        self.shouldScrollCurrentBar = true
-        
     }
     
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
@@ -194,13 +198,10 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        print("didFinishAnimating")
 //        print("currentIndex : \(self.currentIndex)")
         
-//        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
-//        if completed {
-//            print("YESSSSSSSSSSSSSSS")
-//        }
-
-        self.movingIndex = self.currentIndex!
-        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+        if completed {
+            self.movingIndex = self.currentIndex!
+            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+        }
     }
 }
 
@@ -209,10 +210,7 @@ extension ViewPager: UIPageViewControllerDelegate {
 extension ViewPager: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
-//        if (self.isDrag) {
-//            return;
-//        }
-        if scrollView.contentOffset.x == self.view.frame.width || !self.shouldScrollCurrentBar {
+        if scrollView.contentOffset.x == self.view.frame.width {
             return
         }
 //        print(scrollView.contentOffset.x)
@@ -241,26 +239,8 @@ extension ViewPager: UIScrollViewDelegate {
 //        print("targetIndex : \(targetIndex)")
         let offsetX = scrollView.contentOffset.x - self.view.frame.width
         self.menuView.moveIndicator(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
-
+        
 //        print(targetIndex)
 //        print(scrollView.contentOffset.x)
     }
-    
-    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-//        self.isDrag = false
-//        print("----------------- end")
-//        self.movingIndex = self.currentIndex!
-//        //        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
-//        
-////        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
-//        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
-        
-//        self.movingIndex = self.currentIndex!
-//        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
-    }
-    
-    public func scrollViewDidEndScrollingAnimation(scrollView: UIScrollView) {
-//        self.menuView.updateMenuScrollPosition(index: self.currentIndex!)
-    }
-    
 }

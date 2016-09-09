@@ -10,9 +10,7 @@ import UIKit
 
 public class MenuCell: UICollectionViewCell {
     
-    private var label: UILabel!
-    private var view: UIView!
-    
+    public var label: UILabel!
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupViews()
@@ -24,16 +22,20 @@ public class MenuCell: UICollectionViewCell {
     
     // MARK: Private
     func setupViews() {
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.whiteColor()
         label = UILabel()
 //        label.frame = CGRectMake(0, 0, self.frame.width, 40)
-        label.font = UIFont.systemFontOfSize(15)
+//        label.font = UIFont.systemFontOfSize(15)
         label.textColor = UIColor.blackColor()
         label.textAlignment = .Center
         label.lineBreakMode = .ByWordWrapping
-        self.label.backgroundColor = UIColor.whiteColor()
+        self.label.backgroundColor = UIColor.clearColor()
         self.contentView.addSubview(label)
         
+//        let view = UIView()
+//        view.frame = CGRectMake(0, 0, 5, 40)
+//        view.backgroundColor = UIColor.yellowColor()
+//        self.contentView.addSubview(view)
     
         label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
@@ -50,15 +52,7 @@ public class MenuCell: UICollectionViewCell {
             return
         }
         
-        label.text = "\(text)" + "\(indexPath.row)"
-        print(self.contentView.frame.width)
-//        view.frame = CGRectMake(self.contentView.frame.width - 2, 0, 2, self.contentView.frame.height)
-        
-//        let width = MenuCell.cellWidth(text, font: UIFont.systemFontOfSize(15))
-//        label.frame = CGRectMake(0, 0, width, 40)
-//        print(self.frame.size.width)
-
-        
+        label.text = "\(text)"
     }
     
     static func cellWidth(text: String, font: UIFont) -> CGFloat {
@@ -82,7 +76,7 @@ public class MenuCell: UICollectionViewCell {
                                                     context: nil)
 //        let width = max(frame.width + 10 + 10,80)
 //        return 100
-        return frame.width + 30
+        return frame.width + (15 * 2)
 //        return CGFloat(Int(frame.width) + 30)
     }
 }

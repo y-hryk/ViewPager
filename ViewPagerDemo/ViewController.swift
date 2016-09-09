@@ -13,8 +13,22 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        self.title = "View Pager"
         
-        let viewpager = ViewPager(controllers: [ArtistViewController(), PlayListViewController(), AlbumViewController(), SampleViewController()], parentViewController: self)
+        let artistVC = ArtistViewController()
+        artistVC.title = "long long title"
+        let playlistVC = PlayListViewController()
+        playlistVC.title = "playlist"
+        let albumVC = AlbumViewController()
+        albumVC.title = "album"
+        let sampleVC = SampleViewController()
+        sampleVC.title = "sample"
+        let controllers = [artistVC, playlistVC, albumVC, sampleVC]
+        
+        
+        let viewpager = ViewPager(controllers: controllers,
+                                  option: ViewPagerOption(),
+                                  parentViewController: self)
         self.view.addSubview(viewpager.view)
         
 //        self.addChildViewController(viewpager)

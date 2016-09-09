@@ -11,6 +11,7 @@ import UIKit
 
 public class MenuView: UIView {
     
+    private var option = ViewPagerOption()
     var indicatorView: UIView!
     private let factor: CGFloat = 4
     private var currentIndex: Int = 0
@@ -25,6 +26,13 @@ public class MenuView: UIView {
         self.setupViews()
     }
     
+    init(titles: [String], option: ViewPagerOption) {
+        super.init(frame: CGRectZero)
+        self.titles = titles
+        self.option = option
+        self.setupViews()
+    }
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -35,7 +43,7 @@ public class MenuView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .Horizontal
         self.collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: layout)
-        self.collectionView.backgroundColor = UIColor.clearColor()
+        self.collectionView.backgroundColor = UIColor.whiteColor()
         self.collectionView.registerClass(MenuCell.self, forCellWithReuseIdentifier: "MenuCell")
         self.collectionView.showsHorizontalScrollIndicator = false
         self.collectionView.alwaysBounceHorizontal = true
@@ -69,8 +77,6 @@ public class MenuView: UIView {
             NSLayoutConstraint(item: shadowView, attribute: .Bottom, relatedBy: .Equal, toItem: self, attribute: .Bottom, multiplier: 1.0, constant: 0.5),
             NSLayoutConstraint(item: shadowView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.5)
         ])
-        
-        self.titles = ["artistartistartistartist","album","playlist","sample"]
     }
     
     
@@ -137,6 +143,7 @@ extension MenuView : UICollectionViewDataSource {
         let index = indexPath.row % self.titles.count
 //        print("currentIndex : \(indexPath.row) \(index)")
 //        print(index)
+        cell.label.font = self.option.menuItemFont
         cell.setRowData(self.titles, indexPath: NSIndexPath(forRow: index, inSection: 1))
         return cell
     }
@@ -172,7 +179,7 @@ extension MenuView: UICollectionViewDelegate {
 //        return CGSize(width: MenuCell.width, height: MenuCell.height)
         
         let index = indexPath.row % self.titles.count
-        let width = MenuCell.cellWidth(self.titles[index], font: UIFont.systemFontOfSize(15))
+        let width = MenuCell.cellWidth(self.titles[index], font: self.option.menuItemFont)
         return CGSize(width: width, height: self.frame.height)
     }
     
