@@ -14,6 +14,11 @@ public struct ViewPagerOption {
     // viewPager
     public var pagerBackgoundColor: UIColor = UIColor.whiteColor()
     
+    public enum pageType {
+        case Default
+        case Infinity
+    }
+    
     // menuView
     public var backgroundColor = UIColor.whiteColor()
     public var menuItemFontColor = UIColor.blackColor()

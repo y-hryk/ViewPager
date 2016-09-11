@@ -8,9 +8,15 @@
 
 import UIKit
 
+public protocol MenuCellDelegate: class {
+    func menuCellDidTapItems(index index: Int)
+}
+
 public class MenuCell: UICollectionViewCell {
     
     public var label: UILabel!
+    public weak var delegate: MenuCellDelegate?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupViews()
@@ -23,14 +29,19 @@ public class MenuCell: UICollectionViewCell {
     // MARK: Private
     func setupViews() {
         self.backgroundColor = UIColor.whiteColor()
-        label = UILabel()
+        self.label = UILabel()
 //        label.frame = CGRectMake(0, 0, self.frame.width, 40)
 //        label.font = UIFont.systemFontOfSize(15)
-        label.textColor = UIColor.blackColor()
-        label.textAlignment = .Center
-        label.lineBreakMode = .ByWordWrapping
+        self.label.textColor = UIColor.blackColor()
+        self.label.textAlignment = .Center
+        self.label.lineBreakMode = .ByWordWrapping
+        self.label.userInteractionEnabled = true
         self.label.backgroundColor = UIColor.clearColor()
-        self.contentView.addSubview(label)
+        self.contentView.addSubview(self.label)
+        
+        // tapGesture
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapAction))
+        self.label.addGestureRecognizer(tapGesture)
         
 //        let view = UIView()
 //        view.frame = CGRectMake(0, 0, 5, 40)
@@ -52,7 +63,18 @@ public class MenuCell: UICollectionViewCell {
             return
         }
         
-        label.text = "\(text)"
+        self.label.tag = indexPath.row
+        self.label.text = "\(text)"
+    }
+    
+    // MARK: Selctor
+    func labelTapAction(gesture gesture: UITapGestureRecognizer) {
+        
+        guard let index = gesture.view?.tag else {
+            return
+        }
+        
+        self.delegate?.menuCellDidTapItems(index: index)
     }
     
     static func cellWidth(text: String, font: UIFont) -> CGFloat {
