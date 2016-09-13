@@ -18,6 +18,7 @@ public class ViewPager: UIViewController {
         return self.viewControllers.map{ $0 }.indexOf(viewController)
     }
     var movingIndex: Int = 0
+    private var isTapMenuItem = false
     private var pageViewController: UIPageViewController!
     private var menuView: MenuView!
     private var titles = [String]()
@@ -50,7 +51,7 @@ public class ViewPager: UIViewController {
     }
     
     public override func viewDidAppear(animated: Bool) {
-        self.menuView.scrollToMenuItemAtIndex(index: 0)
+        self.menuView.scrollToMenuItemAtIndex(index: 0, animated: false)
     }
     
     override public func viewDidLoad() {
@@ -72,15 +73,15 @@ public class ViewPager: UIViewController {
 //        }
 
         self.movingIndex = 0
-        self.pageViewController.setViewControllers([viewControllers[0]], direction: .Forward, animated: true, completion: nil)
-        
+        self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .Forward, animated: true, completion: nil)
         self.controllerInset()
         
 //        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
-        menuView = MenuView(titles: self.titles, option: self.option)
-        menuView.backgroundColor = UIColor.clearColor()
+        self.menuView = MenuView(titles: self.titles, option: self.option)
+        self.menuView.backgroundColor = UIColor.clearColor()
+        self.menuView.delegate = self
 //        menuView.alpha = 0.3
-        self.view.addSubview(menuView)
+        self.view.addSubview(self.menuView)
         
         for view in self.pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
@@ -110,7 +111,7 @@ public class ViewPager: UIViewController {
     }
     
     // MARK: Private
-    func controllerInset() {
+    private func controllerInset() {
         
         for controller in viewControllers {
             if let controller = controller as? UITableViewController {
@@ -138,6 +139,19 @@ public class ViewPager: UIViewController {
                     break
                 }
             }
+        }
+    }
+    
+    // MARK: Public
+    public func setupPageControllerAtIndex(index index: Int) {
+        self.isTapMenuItem = true
+        self.movingIndex = index
+        print("index \(index)")
+//        self.pageViewController.setViewControllers([viewControllers[index]], direction: .Forward, animated: true, completion: nil)
+        self.pageViewController.setViewControllers([viewControllers[index]], direction: .Forward, animated: true) { (isFinish) in
+            print("currentIndex \(self.currentIndex!)")
+//            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: true)
+            self.isTapMenuItem = false
         }
     }
 }
@@ -189,6 +203,7 @@ extension ViewPager: UIPageViewControllerDelegate {
 //        print("willTransitionToViewControllers")
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
+        self.isTapMenuItem = false
     }
     
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
@@ -200,7 +215,7 @@ extension ViewPager: UIPageViewControllerDelegate {
         
         if completed {
             self.movingIndex = self.currentIndex!
-            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
         }
     }
 }
@@ -210,13 +225,10 @@ extension ViewPager: UIPageViewControllerDelegate {
 extension ViewPager: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(scrollView: UIScrollView) {
-        if scrollView.contentOffset.x == self.view.frame.width {
+        if scrollView.contentOffset.x == self.view.frame.width || self.isTapMenuItem {
             return
         }
 //        print(scrollView.contentOffset.x)
-//        let itemWidth = 80
-//        let ratio = scrollView.frame.size.width
-        
         // nextViewController Index
         
         var targetIndex = 0
@@ -242,5 +254,11 @@ extension ViewPager: UIScrollViewDelegate {
         
 //        print(targetIndex)
 //        print(scrollView.contentOffset.x)
+    }
+}
+
+extension ViewPager: MenuViewDelegate {
+    public func menuViewDidTapMeunItem(index index: Int) {
+        self.setupPageControllerAtIndex(index: index)
     }
 }

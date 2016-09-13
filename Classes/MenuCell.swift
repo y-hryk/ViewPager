@@ -9,7 +9,7 @@
 import UIKit
 
 public protocol MenuCellDelegate: class {
-    func menuCellDidTapItems(index index: Int)
+    func menuCellDidTapItem(index index: Int)
 }
 
 public class MenuCell: UICollectionViewCell {
@@ -74,7 +74,7 @@ public class MenuCell: UICollectionViewCell {
             return
         }
         
-        self.delegate?.menuCellDidTapItems(index: index)
+        self.delegate?.menuCellDidTapItem(index: index)
     }
     
     static func cellWidth(text: String, font: UIFont) -> CGFloat {

@@ -9,8 +9,13 @@
 
 import UIKit
 
+public protocol MenuViewDelegate: class {
+    func menuViewDidTapMeunItem(index index: Int)
+}
+
 public class MenuView: UIView {
     
+    public weak var delegate: MenuViewDelegate?
     private var option = ViewPagerOption()
     var indicatorView: UIView!
     private let factor: CGFloat = 4
@@ -82,11 +87,11 @@ public class MenuView: UIView {
     
     // MARK: Public
     
-    public func scrollToMenuItemAtIndex(index index: Int) {
+    public func scrollToMenuItemAtIndex(index index: Int, animated: Bool) {
         currentIndex = index + self.titles.count
 //        print("currentIndex: \(currentIndex)")
         let indexPath = NSIndexPath(forItem: currentIndex, inSection: 0)
-        self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: false)
+        self.collectionView.scrollToItemAtIndexPath(indexPath, atScrollPosition: .CenteredHorizontally, animated: animated)
         self.currentOffsetX = self.collectionView.contentOffset.x
         let itemWidth = MenuCell.cellWidth(self.titles[index], font: UIFont.systemFontOfSize(15))
         self.indicatorView.frame = CGRectMake((self.frame.width / 2) - (itemWidth / 2), self.frame.height - 2, itemWidth, 2)
@@ -144,6 +149,7 @@ extension MenuView : UICollectionViewDataSource {
 //        print("currentIndex : \(indexPath.row) \(index)")
 //        print(index)
         cell.label.font = self.option.menuItemFont
+        cell.delegate = self
         cell.setRowData(self.titles, indexPath: NSIndexPath(forRow: index, inSection: 1))
         return cell
     }
@@ -191,4 +197,11 @@ extension MenuView: UICollectionViewDelegate {
         
     }
 
+}
+
+extension MenuView: MenuCellDelegate {
+    public func menuCellDidTapItem(index index: Int) {
+        print(index)
+        self.delegate?.menuViewDidTapMeunItem(index: index)
+    }
 }
