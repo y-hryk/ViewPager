@@ -8,23 +8,23 @@
 
 import UIKit
 
-public class ViewPager: UIViewController {
+open class ViewPager: UIViewController {
     
-    private var option = ViewPagerOption()
+    fileprivate var option = ViewPagerOption()
     var currentIndex: Int? {
         guard let viewController = self.pageViewController.viewControllers?.first else {
             return 0
         }
-        return self.viewControllers.map{ $0 }.indexOf(viewController)
+        return self.viewControllers.map{ $0 }.index(of: viewController)
     }
     var movingIndex: Int = 0
-    private var isTapMenuItem = false
-    private var pageViewController: UIPageViewController!
-    private var menuView: MenuView!
-    private var titles = [String]()
-    private var viewControllers = [UIViewController]()
+    fileprivate var isTapMenuItem = false
+    fileprivate var pageViewController: UIPageViewController!
+    fileprivate var menuView: MenuView!
+    fileprivate var titles = [String]()
+    fileprivate var viewControllers = [UIViewController]()
     
-    override public func didReceiveMemoryWarning() {
+    override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
@@ -32,7 +32,7 @@ public class ViewPager: UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         parentViewController.addChildViewController(self)
-        self.didMoveToParentViewController(parentViewController)
+        self.didMove(toParentViewController: parentViewController)
         
         self.viewControllers = controllers
         // titles
@@ -50,22 +50,22 @@ public class ViewPager: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func viewDidAppear(animated: Bool) {
+    open override func viewDidAppear(_ animated: Bool) {
         self.menuView.scrollToMenuItemAtIndex(index: 0, animated: false)
     }
     
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
 //        self.automaticallyAdjustsScrollViewInsets = false
         
-        self.pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         self.pageViewController.dataSource = self
         self.pageViewController.delegate = self
         
 //        self.pageViewController.view.frame = CGRectMake(0, (64 + 40), self.view.frame.width, self.view.frame.height - (64 + 40))
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
-        self.pageViewController.didMoveToParentViewController(self)
+        self.pageViewController.didMove(toParentViewController: self)
         
         
 //        for controller in viewControllers {
@@ -73,12 +73,12 @@ public class ViewPager: UIViewController {
 //        }
 
         self.movingIndex = 0
-        self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .Forward, animated: true, completion: nil)
+        self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
         self.controllerInset()
         
 //        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
         self.menuView = MenuView(titles: self.titles, option: self.option)
-        self.menuView.backgroundColor = UIColor.clearColor()
+        self.menuView.backgroundColor = UIColor.clear
         self.menuView.delegate = self
 //        menuView.alpha = 0.3
         self.view.addSubview(self.menuView)
@@ -94,24 +94,24 @@ public class ViewPager: UIViewController {
         self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
         self.view.addConstraints([
 //            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 0),
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier:1.0, constant: 0),
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0)
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.pageViewController.view, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0)
         ])
         
         // layout menuView
         self.menuView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addConstraints([
-            NSLayoutConstraint(item: self.menuView, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 0),
-            NSLayoutConstraint(item: self.menuView, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.menuView, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.menuView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 40)
+            NSLayoutConstraint(item: self.menuView, attribute: .top, relatedBy: .equal, toItem: topLayoutGuide, attribute: .bottom, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.menuView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1.0, constant: 40)
         ])
     }
     
     // MARK: Private
-    private func controllerInset() {
+    fileprivate func controllerInset() {
         
         for controller in viewControllers {
             if let controller = controller as? UITableViewController {
@@ -143,12 +143,12 @@ public class ViewPager: UIViewController {
     }
     
     // MARK: Public
-    public func setupPageControllerAtIndex(index index: Int) {
+    open func setupPageControllerAtIndex(index: Int) {
         self.isTapMenuItem = true
         self.movingIndex = index
         print("index \(index)")
 //        self.pageViewController.setViewControllers([viewControllers[index]], direction: .Forward, animated: true, completion: nil)
-        self.pageViewController.setViewControllers([viewControllers[index]], direction: .Forward, animated: true) { (isFinish) in
+        self.pageViewController.setViewControllers([viewControllers[index]], direction: .forward, animated: true) { (isFinish) in
             print("currentIndex \(self.currentIndex!)")
 //            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: true)
             self.isTapMenuItem = false
@@ -157,9 +157,9 @@ public class ViewPager: UIViewController {
 }
 
 extension ViewPager: UIPageViewControllerDataSource {
-    
-    private func nextViewController(viewController: UIViewController, isAfter: Bool) -> UIViewController? {
-        guard var index = viewControllers.indexOf(viewController) else {
+     
+    fileprivate func nextViewController(_ viewController: UIViewController, isAfter: Bool) -> UIViewController? {
+        guard var index = viewControllers.index(of: viewController) else {
             return nil
         }
 
@@ -186,11 +186,11 @@ extension ViewPager: UIPageViewControllerDataSource {
         return nil
     }
     
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         return nextViewController(viewController, isAfter: true)
     }
     
-    public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         return nextViewController(viewController, isAfter: false)
     }
 }
@@ -199,14 +199,14 @@ extension ViewPager: UIPageViewControllerDataSource {
 
 extension ViewPager: UIPageViewControllerDelegate {
     
-    public func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
+    public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
 //        print("willTransitionToViewControllers")
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
         self.isTapMenuItem = false
     }
     
-    public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+    public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
 //        print("datasource current index : \(currentIndex)")
 //        self.menuView.updateCurrentIndex(index: currentIndex)
@@ -224,7 +224,7 @@ extension ViewPager: UIPageViewControllerDelegate {
 
 extension ViewPager: UIScrollViewDelegate {
     
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.x == self.view.frame.width || self.isTapMenuItem {
             return
         }
@@ -258,7 +258,7 @@ extension ViewPager: UIScrollViewDelegate {
 }
 
 extension ViewPager: MenuViewDelegate {
-    public func menuViewDidTapMeunItem(index index: Int) {
+    public func menuViewDidTapMeunItem(index: Int) {
         self.setupPageControllerAtIndex(index: index)
     }
 }

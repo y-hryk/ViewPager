@@ -126,6 +126,7 @@
 					D09725C11D76731A0000204F = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 853S365UM8;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -285,6 +286,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.-.ViewPagerDemo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "809b30aa-ad8e-438c-9781-4e366ef8ed64";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -299,6 +301,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.-.ViewPagerDemo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "809b30aa-ad8e-438c-9781-4e366ef8ed64";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

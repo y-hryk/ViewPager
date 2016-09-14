@@ -13,23 +13,23 @@ class AlbumViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.orangeColor()
+        self.view.backgroundColor = UIColor.orange
         
         let label = UILabel()
         label.frame = self.view.frame
         label.center = self.view.center
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.text = "AlbumViewController"
         
         self.view.addSubview(label)
         let view = UIView()
-        view.frame = CGRectMake(0, self.view.frame.height - 50, 200, 50)
-        view.backgroundColor = UIColor.redColor()
+        view.frame = CGRect(x: 0, y: self.view.frame.height - 50, width: 200, height: 50)
+        view.backgroundColor = UIColor.red
         self.view.addSubview(view)
   
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         // Do any additional setup after loading the view.
  
     }

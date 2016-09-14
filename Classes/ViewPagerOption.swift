@@ -12,19 +12,19 @@ public struct ViewPagerOption {
     
     public init() {}
     // viewPager
-    public var pagerBackgoundColor: UIColor = UIColor.whiteColor()
+    public var pagerBackgoundColor: UIColor = UIColor.white
     
     public enum pageType {
-        case Default
-        case Infinity
+        case `default`
+        case infinity
     }
     
     // menuView
-    public var backgroundColor = UIColor.whiteColor()
-    public var menuItemFontColor = UIColor.blackColor()
-    public var menuItemFont = UIFont.systemFontOfSize(15)
-    public var menuItemIndicatorColor = UIColor.blueColor()
-    public var menuItemShadowColor = UIColor.lightGrayColor()
+    public var backgroundColor = UIColor.white
+    public var menuItemFontColor = UIColor.black
+    public var menuItemFont = UIFont.systemFont(ofSize: 15)
+    public var menuItemIndicatorColor = UIColor.blue
+    public var menuItemShadowColor = UIColor.lightGray
     public var menuItemHeight: CGFloat = 40.0
     public var menuItemMargin: CGFloat = 15.0
     public var menuItemWidth: CGFloat?

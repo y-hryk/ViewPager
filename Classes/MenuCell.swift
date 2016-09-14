@@ -9,13 +9,13 @@
 import UIKit
 
 public protocol MenuCellDelegate: class {
-    func menuCellDidTapItem(index index: Int)
+    func menuCellDidTapItem(index: Int)
 }
 
-public class MenuCell: UICollectionViewCell {
+open class MenuCell: UICollectionViewCell {
     
-    public var label: UILabel!
-    public weak var delegate: MenuCellDelegate?
+    open var label: UILabel!
+    open weak var delegate: MenuCellDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,15 +28,15 @@ public class MenuCell: UICollectionViewCell {
     
     // MARK: Private
     func setupViews() {
-        self.backgroundColor = UIColor.whiteColor()
+        self.backgroundColor = UIColor.white
         self.label = UILabel()
 //        label.frame = CGRectMake(0, 0, self.frame.width, 40)
 //        label.font = UIFont.systemFontOfSize(15)
-        self.label.textColor = UIColor.blackColor()
-        self.label.textAlignment = .Center
-        self.label.lineBreakMode = .ByWordWrapping
-        self.label.userInteractionEnabled = true
-        self.label.backgroundColor = UIColor.clearColor()
+        self.label.textColor = UIColor.black
+        self.label.textAlignment = .center
+        self.label.lineBreakMode = .byWordWrapping
+        self.label.isUserInteractionEnabled = true
+        self.label.backgroundColor = UIColor.clear
         self.contentView.addSubview(self.label)
         
         // tapGesture
@@ -50,25 +50,25 @@ public class MenuCell: UICollectionViewCell {
     
         label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
-            NSLayoutConstraint(item: label, attribute: .Top, relatedBy: .Equal, toItem: self.contentView, attribute: .Top, multiplier:1.0, constant: 0),
-            NSLayoutConstraint(item: label, attribute: .Leading, relatedBy: .Equal, toItem: self.contentView, attribute: .Leading, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: label, attribute: .Trailing, relatedBy: .Equal, toItem: self.contentView, attribute: .Trailing, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: label, attribute: .Bottom, relatedBy: .Equal, toItem: self.contentView, attribute: .Bottom, multiplier: 1.0, constant: 0)
+            NSLayoutConstraint(item: label, attribute: .top, relatedBy: .equal, toItem: self.contentView, attribute: .top, multiplier:1.0, constant: 0),
+            NSLayoutConstraint(item: label, attribute: .leading, relatedBy: .equal, toItem: self.contentView, attribute: .leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: label, attribute: .trailing, relatedBy: .equal, toItem: self.contentView, attribute: .trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: label, attribute: .bottom, relatedBy: .equal, toItem: self.contentView, attribute: .bottom, multiplier: 1.0, constant: 0)
             ])
     }
     
     // MARK: Public
-    func setRowData(datas: [String], indexPath: NSIndexPath) {
-        guard let text: String = datas[indexPath.row] else {
+    func setRowData(_ datas: [String], indexPath: IndexPath) {
+        guard let text: String = datas[(indexPath as NSIndexPath).row] else {
             return
         }
         
-        self.label.tag = indexPath.row
+        self.label.tag = (indexPath as NSIndexPath).row
         self.label.text = "\(text)"
     }
     
     // MARK: Selctor
-    func labelTapAction(gesture gesture: UITapGestureRecognizer) {
+    func labelTapAction(gesture: UITapGestureRecognizer) {
         
         guard let index = gesture.view?.tag else {
             return
@@ -77,22 +77,22 @@ public class MenuCell: UICollectionViewCell {
         self.delegate?.menuCellDidTapItem(index: index)
     }
     
-    static func cellWidth(text: String, font: UIFont) -> CGFloat {
+    static func cellWidth(_ text: String, font: UIFont) -> CGFloat {
 //        CGSize maxSize = CGSizeMake(CGFloat.max, 40);
         
         let style = NSMutableParagraphStyle()
-        style.alignment = .Center
-        style.lineBreakMode = .ByWordWrapping
+        style.alignment = .center
+        style.lineBreakMode = .byWordWrapping
         
         let attributes =  [NSFontAttributeName : font,
                            NSParagraphStyleAttributeName : style]
         
         let options = unsafeBitCast(
-            NSStringDrawingOptions.UsesLineFragmentOrigin.rawValue |
-                NSStringDrawingOptions.UsesFontLeading.rawValue,
-            NSStringDrawingOptions.self)
+            NSStringDrawingOptions.usesLineFragmentOrigin.rawValue |
+                NSStringDrawingOptions.usesFontLeading.rawValue,
+            to: NSStringDrawingOptions.self)
         
-        let frame = text.boundingRectWithSize(CGSizeMake(CGFloat.max, 40),
+        let frame = text.boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: 40),
                                                     options: options,
                                                     attributes: attributes,
                                                     context: nil)

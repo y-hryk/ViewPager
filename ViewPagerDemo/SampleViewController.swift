@@ -11,12 +11,12 @@ import UIKit
 class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var tableView: UITableView!
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.scrollsToTop = true
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         tableView.scrollsToTop = false
     }
@@ -24,13 +24,13 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView = UITableView(frame: self.view.frame, style: .Plain)
+        self.tableView = UITableView(frame: self.view.frame, style: .plain)
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        self.tableView.backgroundColor = UIColor.orangeColor()
+        self.tableView.backgroundColor = UIColor.orange
         self.view.addSubview(tableView)
         
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
 
         // Do any additional setup after loading the view.
 //        self.tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -92,22 +92,22 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.didReceiveMemoryWarning()
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return 20
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
         
         // Configure the cell...
         
-        cell.textLabel!.text = "\(indexPath.row)"
+        cell.textLabel!.text = "\((indexPath as NSIndexPath).row)"
         
         return cell
     }

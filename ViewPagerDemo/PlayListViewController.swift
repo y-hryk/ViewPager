@@ -15,24 +15,24 @@ class PlayListViewController: UIViewController {
 
 
         // Do any additional setup after loading the view.
-        self.view.backgroundColor = UIColor.yellowColor()
+        self.view.backgroundColor = UIColor.yellow
         
         let label = UILabel()
         label.frame = self.view.frame
         label.center = self.view.center
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.text = "AlbumViewController"
         self.view.addSubview(label)
         
         
         let topview = UIView()
-        topview.frame = CGRectMake(0, 0, 200, 50)
-        topview.backgroundColor = UIColor.redColor()
+        topview.frame = CGRect(x: 0, y: 0, width: 200, height: 50)
+        topview.backgroundColor = UIColor.red
         self.view.addSubview(topview)
         
         let view = UIView()
-        view.frame = CGRectMake(0, self.view.frame.height - 50, 200, 50)
-        view.backgroundColor = UIColor.redColor()
+        view.frame = CGRect(x: 0, y: self.view.frame.height - 50, width: 200, height: 50)
+        view.backgroundColor = UIColor.red
         self.view.addSubview(view)
     }
 
