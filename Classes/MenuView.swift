@@ -10,7 +10,7 @@
 import UIKit
 
 public protocol MenuViewDelegate: class {
-    func menuViewDidTapMeunItem(index: Int)
+    func menuViewDidTapMeunItem(index: Int, direction: UIPageViewControllerNavigationDirection)
 }
 
 open class MenuView: UIView {
@@ -55,6 +55,7 @@ open class MenuView: UIView {
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         self.collectionView.scrollsToTop = false
+        self.collectionView.isUserInteractionEnabled = true
         self.addSubview(self.collectionView)
         
         let shadowView = UIView()
@@ -96,6 +97,16 @@ open class MenuView: UIView {
         let itemWidth = MenuCell.cellWidth(self.titles[index], font: UIFont.systemFont(ofSize: 15))
         self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
 //        print("------------------ \(self.currentOffsetX)")
+        
+        self.collectionView.visibleCells.forEach { (cell) in
+            if let cell = cell as? MenuCell {
+                if self.currentIndex % self.titles.count  == cell.label.tag % self.titles.count {
+                    cell.label.textColor = UIColor.black
+                } else {
+                    cell.label.textColor = UIColor.lightGray
+                }
+            }
+        }
     }
     
     open func updateMenuScrollPosition(index: Int) {
@@ -110,9 +121,9 @@ open class MenuView: UIView {
 //        print("currentItemWidth : \(currentItemWidth)")
 //        print("nextItemWidth : \(nextItemWidth)")
         
-//        if self.currentOffsetX == 0 {
-//            self.currentOffsetX = self.collectionView.contentOffset.x
-//        }
+        if self.currentOffsetX == 0 {
+            self.currentOffsetX = self.collectionView.contentOffset.x
+        }
         
         let diff = offsetX / self.frame.width
         let diffWidth = fabs(diff) * (nextItemWidth - currentItemWidth)
@@ -123,10 +134,50 @@ open class MenuView: UIView {
         let scrollOffsetX = diff * itemOffetX
         self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX
         
+        var itemColor = self.transionColor(color: UIColor.lightGray)
+        var h_itemColor = self.transionColor(color: UIColor.black)
+        
+        let diffAbs = fabs(diff)
+        print("\(diffAbs)")
+        let prev = UIColor(red: itemColor.red * diffAbs + h_itemColor.red * (1 - diffAbs),
+                           green: itemColor.green * diffAbs + h_itemColor.green * (1 - diffAbs),
+                           blue: itemColor.blue * diffAbs + h_itemColor.blue * (1 - diffAbs),
+                           alpha: itemColor.alpha * diffAbs + h_itemColor.alpha * (1 - diffAbs))
+        
+        let next = UIColor(red: itemColor.red * (1 - diffAbs) + h_itemColor.red * diffAbs,
+                           green: itemColor.green * (1 - diffAbs) + h_itemColor.green * diffAbs,
+                           blue: itemColor.blue * (1 - diffAbs) + h_itemColor.blue * diffAbs,
+                           alpha: itemColor.alpha * (1 - diffAbs) + h_itemColor.alpha * diffAbs)
+        
+        let c_indexPath = IndexPath(item: currentIndex + self.titles.count, section: 0)
+        if let c_cell = self.collectionView.cellForItem(at: c_indexPath) as? MenuCell {
+            c_cell.label.textColor = prev
+        }
+        
+        let n_indexPath = IndexPath(item: nextIndex + self.titles.count, section: 0)
+        if let n_cell = self.collectionView.cellForItem(at: n_indexPath) as? MenuCell {
+            n_cell.label.textColor = next
+        }
+        
         //
 //        if self.collectionView.contentOffset.x >= self.currentOffsetX + itemOffetX {
 //            self.scrollToMenuItemAtIndex(index: currentIndex)
 //        }
+    }
+    
+    open func updateCollectionViewUserInteractionEnabled(userInteractionEnabled: Bool) {
+        self.collectionView.isUserInteractionEnabled = userInteractionEnabled
+    }
+    
+    func transionColor(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
+        var red: CGFloat = 1.0
+        var green: CGFloat = 1.0
+        var blue: CGFloat = 1.0
+        var alpha: CGFloat = 1.0
+        
+        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        return (red: red, green: green, blue: blue, alpha)
     }
 }
 
@@ -150,7 +201,19 @@ extension MenuView : UICollectionViewDataSource {
 //        print(index)
         cell.label.font = self.option.menuItemFont
         cell.delegate = self
-        cell.setRowData(self.titles, indexPath: IndexPath(row: index, section: 1))
+//        cell.setRowData(self.titles, indexPath: IndexPath(row: index, section: 1))
+        
+        cell.label.tag = indexPath.row
+        cell.label.text = ""
+        
+        cell.label.text = self.titles[index]
+        
+        if self.currentIndex % self.titles.count == index {
+            cell.label.textColor = UIColor.black
+        } else {
+            cell.label.textColor = UIColor.lightGray
+        }
+        
         return cell
     }
 }
@@ -195,13 +258,47 @@ extension MenuView: UICollectionViewDelegate {
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        // To Disable CollectionView UserInteractionEnabled
+        self.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
+        
+        let currentIndex = indexPath.row % self.titles.count
+        
+        print("index : \(index)")
+        print("currentIndex : \(currentIndex)")
+        print("self.currentIndex : \(self.currentIndex)")
+        
+        var direction: UIPageViewControllerNavigationDirection = .forward
+        if (indexPath.row < self.titles.count) || (indexPath.row < self.currentIndex) {
+            print("Reverse")
+            direction = .reverse
+        } else {
+            print("forward")
+        }
+        
+//        let targetIndex = indexPath.row < self.titles.count ? indexPath.row + self.titles.count : indexPath.row - self.titles.count
+        let indexPath = IndexPath(item: indexPath.row, section: 0)
+        
+        self.currentIndex = currentIndex
+        self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        self.currentOffsetX = 0
+        
+        let itemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: UIFont.systemFont(ofSize: 15))
+        //        self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+        
+        UIView.animate(withDuration: 0.35) {
+            self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+        }
+        
+        self.delegate?.menuViewDidTapMeunItem(index: currentIndex, direction: direction)
     }
-
+    
+    public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+    
+    }
 }
 
 extension MenuView: MenuCellDelegate {
     public func menuCellDidTapItem(index: Int) {
-        print(index)
-        self.delegate?.menuViewDidTapMeunItem(index: index)
+      
     }
 }

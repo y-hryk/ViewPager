@@ -116,7 +116,7 @@ open class ViewPager: UIViewController {
         for controller in viewControllers {
             if let controller = controller as? UITableViewController {
                 controller.tableView.contentInset.top = 64 + 40
-                controller.tableView.contentOffset.y = 64 + 40
+                controller.tableView.contentOffset.y = -40
                 continue
             }
             if let controller = controller as? UICollectionViewController {
@@ -143,15 +143,26 @@ open class ViewPager: UIViewController {
     }
     
     // MARK: Public
-    open func setupPageControllerAtIndex(index: Int) {
+    open func setupPageControllerAtIndex(index: Int, direction: UIPageViewControllerNavigationDirection) {
         self.isTapMenuItem = true
-        self.movingIndex = index
-        print("index \(index)")
-//        self.pageViewController.setViewControllers([viewControllers[index]], direction: .Forward, animated: true, completion: nil)
-        self.pageViewController.setViewControllers([viewControllers[index]], direction: .forward, animated: true) { (isFinish) in
-            print("currentIndex \(self.currentIndex!)")
-//            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: true)
+        
+        if (index == self.currentIndex!) {
             self.isTapMenuItem = false
+            self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
+            return
+        }
+        
+        self.movingIndex = index
+        self.pageViewController.setViewControllers([viewControllers[index]], direction: direction, animated: true) { (isFinish) in
+//            print("currentIndex \(self.currentIndex!)")
+//            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
+//            self.menuView.scrollToMenuItemAtIndexAnimation(index: self.currentIndex!)
+            self.isTapMenuItem = false
+            
+            // To Disable CollectionView UserInteractionEnabled
+            self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
+            
+            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
         }
     }
 }
@@ -204,6 +215,9 @@ extension ViewPager: UIPageViewControllerDelegate {
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
         self.isTapMenuItem = false
+        
+        // To Disable CollectionView UserInteractionEnabled
+        self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
@@ -217,6 +231,9 @@ extension ViewPager: UIPageViewControllerDelegate {
             self.movingIndex = self.currentIndex!
             self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
         }
+        
+        // To Disable CollectionView UserInteractionEnabled
+        self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
     }
 }
 
@@ -258,7 +275,7 @@ extension ViewPager: UIScrollViewDelegate {
 }
 
 extension ViewPager: MenuViewDelegate {
-    public func menuViewDidTapMeunItem(index: Int) {
-        self.setupPageControllerAtIndex(index: index)
+    public func menuViewDidTapMeunItem(index: Int, direction: UIPageViewControllerNavigationDirection) {
+        self.setupPageControllerAtIndex(index: index, direction: direction)
     }
 }

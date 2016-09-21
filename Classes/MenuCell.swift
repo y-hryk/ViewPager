@@ -14,6 +14,7 @@ public protocol MenuCellDelegate: class {
 
 open class MenuCell: UICollectionViewCell {
     
+    open var index: CGFloat = 0
     open var label: UILabel!
     open weak var delegate: MenuCellDelegate?
     
@@ -40,8 +41,8 @@ open class MenuCell: UICollectionViewCell {
         self.contentView.addSubview(self.label)
         
         // tapGesture
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapAction))
-        self.label.addGestureRecognizer(tapGesture)
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapAction))
+//        self.label.addGestureRecognizer(tapGesture)
         
 //        let view = UIView()
 //        view.frame = CGRectMake(0, 0, 5, 40)
@@ -58,14 +59,15 @@ open class MenuCell: UICollectionViewCell {
     }
     
     // MARK: Public
-    func setRowData(_ datas: [String], indexPath: IndexPath) {
-        guard let text: String = datas[(indexPath as NSIndexPath).row] else {
-            return
-        }
-        
-        self.label.tag = (indexPath as NSIndexPath).row
-        self.label.text = "\(text)"
-    }
+//    func setRowData(_ datas: [String], indexPath: IndexPath) {
+//        
+//        guard let text: String = datas[(indexPath as NSIndexPath).row] else {
+//            return
+//        }
+//        
+//        self.label.tag = (indexPath as NSIndexPath).row
+//        self.label.text = "\(text)"
+//    }
     
     // MARK: Selctor
     func labelTapAction(gesture: UITapGestureRecognizer) {
