@@ -215,7 +215,6 @@ extension ViewPager: UIPageViewControllerDelegate {
 //
 //        self.menuView.scrollToHorizontalCenter(index: currentIndex)
         self.isTapMenuItem = false
-        
         // To Disable CollectionView UserInteractionEnabled
         self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
     }
@@ -277,5 +276,13 @@ extension ViewPager: UIScrollViewDelegate {
 extension ViewPager: MenuViewDelegate {
     public func menuViewDidTapMeunItem(index: Int, direction: UIPageViewControllerNavigationDirection) {
         self.setupPageControllerAtIndex(index: index, direction: direction)
+    }
+    
+    public func menuViewWillBeginDragging(scrollView: UIScrollView) {
+        self.pageViewController.view.isUserInteractionEnabled = false
+    }
+    
+    public func menuViewDidEndDragging(scrollView: UIScrollView) {
+        self.pageViewController.view.isUserInteractionEnabled = true
     }
 }

@@ -21,9 +21,17 @@ class ViewController: UIViewController {
         playlistVC.title = "playlist"
         let albumVC = AlbumViewController()
         albumVC.title = "album"
-        let sampleVC = SampleViewController()
-        sampleVC.title = "sample"
-        let controllers = [artistVC, playlistVC, albumVC, sampleVC]
+        let sampleVC1 = SampleViewController()
+        sampleVC1.title = "sample1"
+        let sampleVC2 = SampleViewController()
+        sampleVC2.title = "sample2"
+        let sampleVC3 = SampleViewController()
+        sampleVC3.title = "sample3"
+        let sampleVC4 = SampleViewController()
+        sampleVC4.title = "sample4"
+        let sampleVC5 = SampleViewController()
+        sampleVC5.title = "sample5"
+        let controllers = [artistVC, playlistVC, albumVC, sampleVC1]
         
         
         let viewpager = ViewPager(controllers: controllers,

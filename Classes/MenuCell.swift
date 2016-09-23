@@ -14,8 +14,8 @@ public protocol MenuCellDelegate: class {
 
 open class MenuCell: UICollectionViewCell {
     
-    open var index: CGFloat = 0
     open var label: UILabel!
+    open var indicator: UIView!
     open weak var delegate: MenuCellDelegate?
     
     override init(frame: CGRect) {
@@ -30,9 +30,8 @@ open class MenuCell: UICollectionViewCell {
     // MARK: Private
     func setupViews() {
         self.backgroundColor = UIColor.white
+        
         self.label = UILabel()
-//        label.frame = CGRectMake(0, 0, self.frame.width, 40)
-//        label.font = UIFont.systemFontOfSize(15)
         self.label.textColor = UIColor.black
         self.label.textAlignment = .center
         self.label.lineBreakMode = .byWordWrapping
@@ -40,14 +39,8 @@ open class MenuCell: UICollectionViewCell {
         self.label.backgroundColor = UIColor.clear
         self.contentView.addSubview(self.label)
         
-        // tapGesture
-//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(labelTapAction))
-//        self.label.addGestureRecognizer(tapGesture)
-        
-//        let view = UIView()
-//        view.frame = CGRectMake(0, 0, 5, 40)
-//        view.backgroundColor = UIColor.yellowColor()
-//        self.contentView.addSubview(view)
+        self.indicator = UIView()
+        self.contentView.addSubview(self.indicator)
     
         label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
