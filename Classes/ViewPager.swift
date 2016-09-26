@@ -66,11 +66,6 @@ open class ViewPager: UIViewController {
         self.addChildViewController(self.pageViewController)
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMove(toParentViewController: self)
-        
-        
-//        for controller in viewControllers {
-//            controller.view.frame = CGRectMake(0, 0, self.view.frame.width, self.view.frame.height - (64 + 40))
-//        }
 
         self.movingIndex = 0
         self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
@@ -153,16 +148,17 @@ open class ViewPager: UIViewController {
         }
         
         self.movingIndex = index
-        self.pageViewController.setViewControllers([viewControllers[index]], direction: direction, animated: true) { (isFinish) in
-//            print("currentIndex \(self.currentIndex!)")
-//            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
-//            self.menuView.scrollToMenuItemAtIndexAnimation(index: self.currentIndex!)
-            self.isTapMenuItem = false
+        self.pageViewController.setViewControllers([viewControllers[index]], direction: direction, animated: true) { [weak self] (isFinish) in
+            
+            guard let weakself = self else {
+                return
+            }
+            
+            weakself.isTapMenuItem = false
             
             // To Disable CollectionView UserInteractionEnabled
-            self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
-            
-            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
+            weakself.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
+            weakself.menuView.scrollToMenuItemAtIndex(index: weakself.currentIndex!, animated: false)
         }
     }
 }
@@ -174,21 +170,20 @@ extension ViewPager: UIPageViewControllerDataSource {
             return nil
         }
 
-//        print("datasource current index : \(currentIndex)")
         if isAfter {
             index += 1
         } else {
             index -= 1
         }
-
         
-//        print("next index : \(index)")
-        
-        if index < 0 {
-            index = viewControllers.count - 1
-        } else if index == viewControllers.count {
-            index = 0
+        if self.option.pagerType.isInfinity() {
+            if index == viewControllers.count {
+                index = 0
+            }
             
+            if index < 0 {
+                index = viewControllers.count - 1
+            }
         }
         
         if index >= 0 && index < viewControllers.count {
@@ -211,20 +206,13 @@ extension ViewPager: UIPageViewControllerDataSource {
 extension ViewPager: UIPageViewControllerDelegate {
     
     public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
-//        print("willTransitionToViewControllers")
-//
-//        self.menuView.scrollToHorizontalCenter(index: currentIndex)
+
         self.isTapMenuItem = false
         // To Disable CollectionView UserInteractionEnabled
         self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        
-//        print("datasource current index : \(currentIndex)")
-//        self.menuView.updateCurrentIndex(index: currentIndex)
-//        print("didFinishAnimating")
-//        print("currentIndex : \(self.currentIndex)")
         
         if completed {
             self.movingIndex = self.currentIndex!
@@ -244,9 +232,7 @@ extension ViewPager: UIScrollViewDelegate {
         if scrollView.contentOffset.x == self.view.frame.width || self.isTapMenuItem {
             return
         }
-//        print(scrollView.contentOffset.x)
-        // nextViewController Index
-        
+
         var targetIndex = 0
         if scrollView.contentOffset.x > self.view.frame.width {
             targetIndex = self.movingIndex + 1
@@ -255,21 +241,19 @@ extension ViewPager: UIScrollViewDelegate {
         }
         
         // infinity setting
-        if targetIndex == viewControllers.count {
-            targetIndex = 0
+        if self.option.pagerType.isInfinity() {
+            if targetIndex == viewControllers.count {
+                targetIndex = 0
+            }
+            
+            if targetIndex < 0 {
+                targetIndex = viewControllers.count - 1
+            }
         }
         
-        if targetIndex < 0 {
-            targetIndex = viewControllers.count - 1
-        }
-        
-//        print("self.currentIndex : \(self.movingIndex)")
-//        print("targetIndex : \(targetIndex)")
         let offsetX = scrollView.contentOffset.x - self.view.frame.width
         self.menuView.moveIndicator(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
-        
-//        print(targetIndex)
-//        print(scrollView.contentOffset.x)
+    
     }
 }
 

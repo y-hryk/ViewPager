@@ -19,7 +19,7 @@ open class MenuView: UIView {
     
     open weak var delegate: MenuViewDelegate?
     fileprivate var option = ViewPagerOption()
-    var indicatorView: UIView!
+    fileprivate var indicatorView: UIView!
     fileprivate let factor: CGFloat = 4
     fileprivate var currentIndex: Int = 0
     fileprivate var currentOffsetX: CGFloat = 0.0
@@ -86,13 +86,19 @@ open class MenuView: UIView {
             NSLayoutConstraint(item: shadowView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1.0, constant: 0.5)
         ])
     }
-    
-    
+
+    fileprivate func transionColorToRGBA(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
+        
+        var red: CGFloat = 1.0, green: CGFloat = 1.0, blue: CGFloat = 1.0, alpha: CGFloat = 1.0
+        
+        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return (red: red, green: green, blue: blue, alpha)
+    }
+
     // MARK: Public
-    
     open func scrollToMenuItemAtIndex(index: Int, animated: Bool) {
-        currentIndex = index + self.titles.count
-//        print("currentIndex: \(currentIndex)")
+        
+        self.currentIndex = self.option.pagerType.isInfinity() ? index + self.titles.count : index
         let indexPath = IndexPath(item: currentIndex, section: 0)
         self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
         self.currentOffsetX = self.collectionView.contentOffset.x
@@ -104,42 +110,21 @@ open class MenuView: UIView {
             if let cell = cell as? MenuCell {
                 if self.currentIndex % self.titles.count  == cell.label.tag % self.titles.count {
                     cell.label.textColor = self.option.menuItemSelectedFontColor
-                  
-                    
-//                    UIView.animate(withDuration: 0.35) {
-//                        cell.label.font = self.option.menuItemSelectedFont
-//                    }
-                    
-                    UIView.transition(with: cell.label,
-                                      duration: 0.35,
-                                      options: .curveLinear,
-                                      animations: { 
-                                        
-                                        cell.label.font = self.option.menuItemSelectedFont
-                        }, completion: nil)
+                    cell.label.font = self.option.menuItemSelectedFont
                     cell.indicator.isHidden = false
                 } else {
                     cell.label.textColor = self.option.menuItemFontColor
                     cell.label.font = self.option.menuItemFont
                     cell.indicator.isHidden = true
                 }
-                
             }
         }
         self.indicatorView.isHidden = true
     }
     
-    open func updateMenuScrollPosition(index: Int) {
-       self.currentOffsetX = self.collectionView.contentOffset.x
-    }
-    
     open func moveIndicator(currentIndex: Int, nextIndex: Int, offsetX: CGFloat) {
         let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: UIFont.systemFont(ofSize: 15))
         let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], font: UIFont.systemFont(ofSize: 15))
-        
-//        print(offsetX)
-//        print("currentItemWidth : \(currentItemWidth)")
-//        print("nextItemWidth : \(nextItemWidth)")
         
         if self.currentOffsetX == 0 {
             self.currentOffsetX = self.collectionView.contentOffset.x
@@ -162,8 +147,8 @@ open class MenuView: UIView {
         let scrollOffsetX = diff * itemOffetX
         self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX
         
-        let itemColor = self.transionColor(color: self.option.menuItemFontColor)
-        let h_itemColor = self.transionColor(color: self.option.menuItemSelectedFontColor)
+        let itemColor = self.transionColorToRGBA(color: self.option.menuItemFontColor)
+        let h_itemColor = self.transionColorToRGBA(color: self.option.menuItemSelectedFontColor)
         
         
         // MenuView hightlite
@@ -179,7 +164,7 @@ open class MenuView: UIView {
                            alpha: itemColor.alpha * (1 - diffAbs) + h_itemColor.alpha * diffAbs)
         
         // curent
-        var c_indexPath = IndexPath(item: currentIndex + self.titles.count, section: 0)
+        let c_indexPath = IndexPath(item: currentIndex + self.titles.count, section: 0)
         if let c_cell = self.collectionView.cellForItem(at: c_indexPath) as? MenuCell {
             c_cell.label.textColor = prev
             if diffAbs < 0.5 {
@@ -213,11 +198,6 @@ open class MenuView: UIView {
 //        print("nextIndex : \(nextIndex)");
 //        print("c_indexPath : \(c_indexPath.row)");
 //        print("n_indexPath : \(n_indexPath.row)\n");
-        
-        //
-//        if self.collectionView.contentOffset.x >= self.currentOffsetX + itemOffetX {
-//            self.scrollToMenuItemAtIndex(index: currentIndex)
-//        }
     }
     
     open func updateCollectionViewUserInteractionEnabled(userInteractionEnabled: Bool) {
@@ -226,18 +206,6 @@ open class MenuView: UIView {
     
     open func updateIndicatorHidden(hidden: Bool) {
         self.indicatorView.isHidden = hidden
-    }
-    
-    // MARK: Private
-    func transionColor(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
-        var red: CGFloat = 1.0
-        var green: CGFloat = 1.0
-        var blue: CGFloat = 1.0
-        var alpha: CGFloat = 1.0
-        
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        
-        return (red: red, green: green, blue: blue, alpha)
     }
 }
 
@@ -259,33 +227,9 @@ extension MenuView : UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MenuCell", for: indexPath) as! MenuCell
         
-        let index = (indexPath as NSIndexPath).row % self.titles.count
-//        print("currentIndex : \(indexPath.row) \(index)")
-//        print(index)
-        cell.label.font = self.option.menuItemFont
         cell.delegate = self
-//        cell.setRowData(self.titles, indexPath: IndexPath(row: index, section: 1))
-        
-        cell.label.tag = indexPath.row
-        cell.label.text = ""
-        
-        cell.label.text = self.titles[index]
-        
-        cell.indicator.backgroundColor = self.option.menuItemIndicatorColor
-        let width = MenuCell.cellWidth(self.titles[index], font: self.option.menuItemFont)
-        cell.indicator.frame = CGRect(x: 0, y: cell.frame.size.height - 2, width: width, height: 2)
-        
-        if self.currentIndex % self.titles.count == index {
-            cell.label.textColor = self.option.menuItemSelectedFontColor
-            cell.label.font = self.option.menuItemSelectedFont
-            cell.indicator.isHidden = false
-        } else {
-            cell.label.textColor = self.option.menuItemFontColor
-            cell.label.font = self.option.menuItemFont
-            cell.indicator.isHidden = true
-        }
-        
-        
+        cell.setRowData(datas: self.titles, indexPath: indexPath, currentIndex: self.currentIndex, option: self.option)
+        print("\(self.currentIndex)")
         return cell
     }
 }
@@ -295,18 +239,18 @@ extension MenuView: UICollectionViewDelegate {
     
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if itemsWidth == 0.0 {
-            itemsWidth = floor(scrollView.contentSize.width / factor)
+        if self.itemsWidth == 0.0 {
+            self.itemsWidth = floor(scrollView.contentSize.width / self.factor)
         }
         
-        if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > itemsWidth * 2.0) {
-            scrollView.contentOffset.x = itemsWidth
+        if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.itemsWidth * 2.0) {
+            scrollView.contentOffset.x = self.itemsWidth
         }
-        
-//        print(scrollView.contentOffset.x)
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.indicatorView.isHidden = true
+        self.collectionView.reloadData()
         self.delegate?.menuViewWillBeginDragging(scrollView: scrollView)
     }
     
@@ -314,22 +258,22 @@ extension MenuView: UICollectionViewDelegate {
         self.delegate?.menuViewDidEndDragging(scrollView: scrollView)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
         return 0.0
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
         
         let index = (indexPath as NSIndexPath).row % self.titles.count
         let width = MenuCell.cellWidth(self.titles[index], font: self.option.menuItemFont)
         return CGSize(width: width, height: self.frame.height)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
         return 0.0
     }
     
@@ -337,7 +281,6 @@ extension MenuView: UICollectionViewDelegate {
         
         // To Disable CollectionView UserInteractionEnabled
         self.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
-
         
         let currentIndex = indexPath.row % self.titles.count
         
@@ -357,7 +300,7 @@ extension MenuView: UICollectionViewDelegate {
         
         let indexPath = IndexPath(item: indexPath.row, section: 0)
         
-        self.currentIndex = currentIndex + self.titles.count
+        self.currentIndex = self.option.pagerType.isInfinity() ? currentIndex + self.titles.count : currentIndex
         self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         self.currentOffsetX = 0
         

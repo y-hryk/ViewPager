@@ -29,7 +29,6 @@ public struct ViewPagerOption {
                 return true
             case .segmeted:
                 return false
-            default: break
             }
         }
     }

@@ -42,7 +42,7 @@ open class MenuCell: UICollectionViewCell {
         self.indicator = UIView()
         self.contentView.addSubview(self.indicator)
     
-        label.translatesAutoresizingMaskIntoConstraints = false
+        self.label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
             NSLayoutConstraint(item: label, attribute: .top, relatedBy: .equal, toItem: self.contentView, attribute: .top, multiplier:1.0, constant: 0),
             NSLayoutConstraint(item: label, attribute: .leading, relatedBy: .equal, toItem: self.contentView, attribute: .leading, multiplier: 1.0, constant: 0),
@@ -52,15 +52,32 @@ open class MenuCell: UICollectionViewCell {
     }
     
     // MARK: Public
-//    func setRowData(_ datas: [String], indexPath: IndexPath) {
-//        
-//        guard let text: String = datas[(indexPath as NSIndexPath).row] else {
-//            return
-//        }
-//        
-//        self.label.tag = (indexPath as NSIndexPath).row
-//        self.label.text = "\(text)"
-//    }
+    func setRowData( datas: [String], indexPath: IndexPath, currentIndex: Int, option: ViewPagerOption) {
+        
+        if datas.isEmpty { return }
+        
+        let index = indexPath.row % datas.count
+        
+        self.label.tag = indexPath.row
+        self.label.text = ""
+        
+        self.label.font = option.menuItemFont
+        self.label.text = datas[index]
+        
+        self.indicator.backgroundColor = option.menuItemIndicatorColor
+        let width = MenuCell.cellWidth(datas[index], font: option.menuItemFont)
+        self.indicator.frame = CGRect(x: 0, y: self.frame.size.height - 2, width: width, height: 2)
+        
+        if currentIndex % datas.count == index {
+            self.label.textColor = option.menuItemSelectedFontColor
+            self.label.font = option.menuItemSelectedFont
+            self.indicator.isHidden = false
+        } else {
+            self.label.textColor = option.menuItemFontColor
+            self.label.font = option.menuItemFont
+            self.indicator.isHidden = true
+        }
+    }
     
     // MARK: Selctor
     func labelTapAction(gesture: UITapGestureRecognizer) {
