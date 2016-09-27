@@ -32,7 +32,7 @@ public struct ViewPagerOption {
             }
         }
     }
-    public var pagerType: pagerType = .infinityFlexible
+    public var pagerType: pagerType = .segmeted
     
     // menuView
     public var backgroundColor = UIColor.white

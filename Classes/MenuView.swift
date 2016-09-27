@@ -123,6 +123,39 @@ open class MenuView: UIView {
     }
     
     open func moveIndicator(currentIndex: Int, nextIndex: Int, offsetX: CGFloat) {
+        
+        // indicator settting
+        self.indicatorView.isHidden = false
+        self.collectionView.visibleCells.forEach { (cell) in
+            if let cell = cell as? MenuCell {
+                cell.indicator.isHidden = true
+            }
+        }
+        
+        if nextIndex >= 0 && nextIndex < self.titles.count {
+            
+            if self.currentOffsetX == 0 {
+                self.currentOffsetX = self.collectionView.contentOffset.x
+            }
+            
+            let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: UIFont.systemFont(ofSize: 15))
+            let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], font: UIFont.systemFont(ofSize: 15))
+            let diffItemWidth = (nextItemWidth - currentItemWidth)
+            
+            // scroll diff
+            let diff = offsetX / self.frame.width
+            let scrollOffsetX = diff * currentItemWidth
+            
+            self.indicatorView.frame = CGRect(x: scrollOffsetX + self.currentOffsetX, y: self.frame.height - 2, width: 80, height: 2)
+            print("\(scrollOffsetX)")
+            
+            self.collectionView.contentOffset.x = self.currentOffsetX - (fabs(diff) * diffItemWidth)
+        }
+        
+        return
+        
+    
+        // infinity
         let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: UIFont.systemFont(ofSize: 15))
         let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], font: UIFont.systemFont(ofSize: 15))
         
@@ -184,6 +217,8 @@ open class MenuView: UIView {
             n_indexPath = IndexPath(item: self.titles.count - 1, section: 0)
         }
         
+        
+        // font
         if let n_cell = self.collectionView.cellForItem(at: n_indexPath) as? MenuCell {
             n_cell.label.textColor = next
             if diffAbs > 0.5 {
@@ -229,7 +264,7 @@ extension MenuView : UICollectionViewDataSource {
         
         cell.delegate = self
         cell.setRowData(datas: self.titles, indexPath: indexPath, currentIndex: self.currentIndex, option: self.option)
-        print("\(self.currentIndex)")
+        
         return cell
     }
 }
@@ -239,13 +274,17 @@ extension MenuView: UICollectionViewDelegate {
     
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.itemsWidth == 0.0 {
-            self.itemsWidth = floor(scrollView.contentSize.width / self.factor)
-        }
         
-        if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.itemsWidth * 2.0) {
-            scrollView.contentOffset.x = self.itemsWidth
+        if self.option.pagerType.isInfinity() {
+            if self.itemsWidth == 0.0 {
+                self.itemsWidth = floor(scrollView.contentSize.width / self.factor)
+            }
+            
+            if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.itemsWidth * 2.0) {
+                scrollView.contentOffset.x = self.itemsWidth
+            }
         }
+
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

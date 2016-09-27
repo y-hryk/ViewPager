@@ -31,7 +31,7 @@ class ViewController: UIViewController {
         sampleVC4.title = "sample4"
         let sampleVC5 = SampleViewController()
         sampleVC5.title = "sample5"
-        let controllers = [artistVC, playlistVC, albumVC, sampleVC1]
+        let controllers = [artistVC, playlistVC, albumVC, sampleVC1, sampleVC2, sampleVC3]
         
         
         let viewpager = ViewPager(controllers: controllers,
