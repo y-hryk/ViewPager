@@ -375,7 +375,7 @@ extension MenuView: UICollectionViewDelegate {
         }
         
         var direction: UIPageViewControllerNavigationDirection = .forward
-        if (indexPath.row < self.titles.count) || (indexPath.row < self.currentIndex) {
+        if ((self.option.pagerType.isInfinity() && indexPath.row < self.titles.count)) || (indexPath.row < self.currentIndex) {
             direction = .reverse
         }
         

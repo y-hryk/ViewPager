@@ -52,6 +52,7 @@ open class ViewPager: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         self.menuView.scrollToMenuItemAtIndex(index: 0, animated: false)
+//        self.controllerInset()
     }
     
     override open func viewDidLoad() {
@@ -69,7 +70,7 @@ open class ViewPager: UIViewController {
 
         self.movingIndex = 0
         self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
-        self.controllerInset()
+        
         
 //        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
         self.menuView = MenuView(titles: self.titles, option: self.option)
@@ -112,28 +113,31 @@ open class ViewPager: UIViewController {
             if let controller = controller as? UITableViewController {
                 controller.tableView.contentInset.top = 64 + 40
                 controller.tableView.contentOffset.y = -40
+//                controller.tableView.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+                controller.tableView.contentOffset = CGPoint(x: 0, y: controller.tableView.contentInset.top)
                 continue
             }
             if let controller = controller as? UICollectionViewController {
                 controller.collectionView!.contentInset.top = 64 + 40
-                controller.collectionView!.contentOffset.y = 64 + 40
+                controller.collectionView!.contentOffset.y = -40
+                controller.view.setNeedsLayout()
                 continue
             }
             
-            for view in controller.view.subviews {
-//                if let view = view as? UITableView {
+//            for view in controller.view.subviews {
+////                if let view = view as? UITableView {
+////                    view.contentInset.top = 64 + 40
+////                    break
+////                }
+////                if let view = view as? UICollectionView {
+////                    view.contentInset.top = 64 + 40
+////                    break
+////                }
+//                if let view = view as? UIScrollView {
 //                    view.contentInset.top = 64 + 40
 //                    break
 //                }
-//                if let view = view as? UICollectionView {
-//                    view.contentInset.top = 64 + 40
-//                    break
-//                }
-                if let view = view as? UIScrollView {
-                    view.contentInset.top = 64 + 40
-                    break
-                }
-            }
+//            }
         }
     }
     
