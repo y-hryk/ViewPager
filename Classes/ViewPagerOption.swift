@@ -43,7 +43,8 @@ public struct ViewPagerOption {
     public var menuItemIndicatorColor = UIColor.blue
     public var menuItemShadowColor = UIColor.lightGray
     public var menuItemHeight: CGFloat = 40.0
-    public var menuItemMargin: CGFloat = 15.0
+    public var menuItemMargin: CGFloat = 5.0
     public var menuItemWidth: CGFloat?
+    
     
 }

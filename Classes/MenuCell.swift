@@ -36,7 +36,7 @@ open class MenuCell: UICollectionViewCell {
         self.label.textAlignment = .center
         self.label.lineBreakMode = .byWordWrapping
         self.label.isUserInteractionEnabled = true
-        self.label.backgroundColor = UIColor.clear
+        self.label.backgroundColor = UIColor.orange
         self.contentView.addSubview(self.label)
         
         self.indicator = UIView()
@@ -109,8 +109,10 @@ open class MenuCell: UICollectionViewCell {
                                                     attributes: attributes,
                                                     context: nil)
 //        let width = max(frame.width + 10 + 10,80)
+        
+//        return frame.width + (5 * 2) + (5 * 2)
 //        return 100
-        return frame.width + (15 * 2)
+        return CGFloat(Int(frame.width) + (10 * 2))
 //        return CGFloat(Int(frame.width) + 30)
     }
 }
