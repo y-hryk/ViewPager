@@ -88,12 +88,60 @@ open class MenuView: UIView {
         ])
     }
 
-    fileprivate func transionColorToRGBA(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
+    fileprivate func colorToRGBA(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
         
         var red: CGFloat = 1.0, green: CGFloat = 1.0, blue: CGFloat = 1.0, alpha: CGFloat = 1.0
         
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         return (red: red, green: green, blue: blue, alpha)
+    }
+    
+    fileprivate func changeMenuItemFontColor(ratio: CGFloat, currentIndex: Int, nextIndex: Int ) {
+        
+        let color = self.colorToRGBA(color: self.option.menuItemFontColor)
+        let selectedColor = self.colorToRGBA(color: self.option.menuItemSelectedFontColor)
+        
+        let ratioAbs = fabs(ratio)
+        let currentColor = UIColor(red:     color.red   * ratioAbs       + selectedColor.red    * (1 - ratioAbs),
+                                   green:   color.green * ratioAbs       + selectedColor.green  * (1 - ratioAbs),
+                                   blue:    color.blue  * ratioAbs       + selectedColor.blue   * (1 - ratioAbs),
+                                   alpha:   color.alpha * ratioAbs       + selectedColor.alpha  * (1 - ratioAbs))
+        
+        let nextColor    = UIColor(red:     color.red   * (1 - ratioAbs) + selectedColor.red    * ratioAbs,
+                                   green:   color.green * (1 - ratioAbs) + selectedColor.green  * ratioAbs,
+                                   blue:    color.blue  * (1 - ratioAbs) + selectedColor.blue   * ratioAbs,
+                                   alpha:   color.alpha * (1 - ratioAbs) + selectedColor.alpha  * ratioAbs)
+        
+        // Current itemFont
+        let currentIndexPath = IndexPath(item: self.option.pagerType.isInfinity() ? currentIndex + self.titles.count : currentIndex, section: 0)
+        if let currentCell = self.collectionView.cellForItem(at: currentIndexPath) as? MenuCell {
+            currentCell.label.textColor = currentColor
+            if ratioAbs < 0.5 {
+                currentCell.label.font = self.option.menuItemSelectedFont
+            } else {
+                currentCell.label.font = self.option.menuItemFont
+            }
+        }
+        
+        // Next ItemFont
+        var nextIndexPath = IndexPath(item: self.option.pagerType.isInfinity() ? nextIndex + self.titles.count : nextIndex, section: 0)
+        
+        if currentIndex == self.titles.count - 1 && nextIndex == 0 {
+            nextIndexPath = IndexPath(item: self.titles.count * 2, section: 0)
+        }
+        if nextIndex == self.titles.count - 1 && currentIndex == 0 {
+            nextIndexPath = IndexPath(item: self.titles.count - 1, section: 0)
+        }
+        
+        if let nextCell = self.collectionView.cellForItem(at: nextIndexPath) as? MenuCell {
+            nextCell.label.textColor = nextColor
+            if ratioAbs > 0.5 {
+                nextCell.label.font = self.option.menuItemSelectedFont
+            } else {
+                nextCell.label.font = self.option.menuItemFont
+            }
+        }
+        
     }
 
     // MARK: Public
@@ -222,59 +270,9 @@ open class MenuView: UIView {
             
         }
         
-        let itemColor = self.transionColorToRGBA(color: self.option.menuItemFontColor)
-        let h_itemColor = self.transionColorToRGBA(color: self.option.menuItemSelectedFontColor)
-        
-        
-        // MenuView hightlite
-        let diffAbs = fabs(diff)
-        let prev = UIColor(red: itemColor.red * diffAbs + h_itemColor.red * (1 - diffAbs),
-                           green: itemColor.green * diffAbs + h_itemColor.green * (1 - diffAbs),
-                           blue: itemColor.blue * diffAbs + h_itemColor.blue * (1 - diffAbs),
-                           alpha: itemColor.alpha * diffAbs + h_itemColor.alpha * (1 - diffAbs))
-        
-        let next = UIColor(red: itemColor.red * (1 - diffAbs) + h_itemColor.red * diffAbs,
-                           green: itemColor.green * (1 - diffAbs) + h_itemColor.green * diffAbs,
-                           blue: itemColor.blue * (1 - diffAbs) + h_itemColor.blue * diffAbs,
-                           alpha: itemColor.alpha * (1 - diffAbs) + h_itemColor.alpha * diffAbs)
-        
-        // curent
-        let c_indexPath = IndexPath(item: self.option.pagerType.isInfinity() ? currentIndex + self.titles.count : currentIndex, section: 0)
-        if let c_cell = self.collectionView.cellForItem(at: c_indexPath) as? MenuCell {
-            c_cell.label.textColor = prev
-            if diffAbs < 0.5 {
-                c_cell.label.font = self.option.menuItemSelectedFont
-            } else {
-                c_cell.label.font = self.option.menuItemFont
-            }
-        }
-        
-        // next
-        var n_indexPath = IndexPath(item: self.option.pagerType.isInfinity() ? nextIndex + self.titles.count : nextIndex, section: 0)
-        
-        if currentIndex == self.titles.count - 1 && nextIndex == 0 {
-            n_indexPath = IndexPath(item: self.titles.count * 2, section: 0)
-        }
-        if nextIndex == self.titles.count - 1 && currentIndex == 0 {
-            n_indexPath = IndexPath(item: self.titles.count - 1, section: 0)
-        }
-        
-        
-        // font
-        if let n_cell = self.collectionView.cellForItem(at: n_indexPath) as? MenuCell {
-            n_cell.label.textColor = next
-            if diffAbs > 0.5 {
-                n_cell.label.font = self.option.menuItemSelectedFont
-            } else {
-                n_cell.label.font = self.option.menuItemFont
-            }
+        // menu item animation
+        self.changeMenuItemFontColor(ratio: diff, currentIndex: currentIndex, nextIndex: nextIndex)
 
-        }
-        
-//        print("currentIndex : \(currentIndex)");
-//        print("nextIndex : \(nextIndex)");
-//        print("c_indexPath : \(c_indexPath.row)");
-//        print("n_indexPath : \(n_indexPath.row)\n");
     }
     
     open func updateCollectionViewUserInteractionEnabled(userInteractionEnabled: Bool) {

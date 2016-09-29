@@ -27,10 +27,13 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
         self.tableView = UITableView(frame: self.view.frame, style: .plain)
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        self.tableView.backgroundColor = UIColor.orange
+        self.tableView.backgroundColor = UIColor.clear
         self.view.addSubview(tableView)
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
+        
+        self.tableView.contentInset.top = 64 + 40
+        self.tableView.contentOffset = CGPoint(x: 0, y: -self.tableView.contentInset.top)
 
         // Do any additional setup after loading the view.
 //        self.tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -84,6 +87,7 @@ class SampleViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     override func viewDidLayoutSubviews() {
 //        print("viewDidLayoutSubviews")
+        print(self.view.frame)
 //        tableView.frame = self.view.frame
     }
     

@@ -34,6 +34,13 @@ public struct ViewPagerOption {
     }
     public var pagerType: pagerType = .segmeted
     
+    public enum pagerLayoutType {
+        case fullScreen
+        case flexible
+    }
+    
+    public var pagerLayoutType: pagerLayoutType = .fullScreen
+    
     // menuView
     public var backgroundColor = UIColor.white
     public var menuItemFontColor = UIColor.lightGray

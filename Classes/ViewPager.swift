@@ -43,7 +43,7 @@ open class ViewPager: UIViewController {
             self.titles.append(title)
         }
         self.option = option
-//        parentViewController.automaticallyAdjustsScrollViewInsets = false
+        parentViewController.automaticallyAdjustsScrollViewInsets = false
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -57,7 +57,7 @@ open class ViewPager: UIViewController {
     
     override open func viewDidLoad() {
         super.viewDidLoad()
-//        self.automaticallyAdjustsScrollViewInsets = false
+        self.automaticallyAdjustsScrollViewInsets = false
         
         self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         self.pageViewController.dataSource = self
@@ -68,15 +68,11 @@ open class ViewPager: UIViewController {
         self.view.addSubview(self.pageViewController.view)
         self.pageViewController.didMove(toParentViewController: self)
 
-        self.movingIndex = 0
-        self.pageViewController.setViewControllers([viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
-        
-        
+     
 //        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
         self.menuView = MenuView(titles: self.titles, option: self.option)
         self.menuView.backgroundColor = UIColor.clear
         self.menuView.delegate = self
-//        menuView.alpha = 0.3
         self.view.addSubview(self.menuView)
         
         for view in self.pageViewController.view.subviews {
@@ -89,8 +85,6 @@ open class ViewPager: UIViewController {
         // layout pageController
         self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
         self.view.addConstraints([
-//            NSLayoutConstraint(item: self.pageViewController.view, attribute: .Top, relatedBy: .Equal, toItem: topLayoutGuide, attribute: .Bottom, multiplier:1.0, constant: 0),
-            NSLayoutConstraint(item: self.pageViewController.view, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier:1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.pageViewController.view, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0)
@@ -104,6 +98,20 @@ open class ViewPager: UIViewController {
             NSLayoutConstraint(item: self.menuView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1.0, constant: 0),
             NSLayoutConstraint(item: self.menuView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1.0, constant: 40)
         ])
+        
+        if self.option.pagerLayoutType == .fullScreen {
+            self.view.addConstraints([
+                NSLayoutConstraint(item: self.pageViewController.view, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier:1.0, constant: 0),
+                ])
+        } else {
+            self.view.addConstraints([
+                NSLayoutConstraint(item: self.pageViewController.view, attribute: .top, relatedBy: .equal, toItem: topLayoutGuide, attribute: .bottom, multiplier:1.0, constant: 40),
+                ])
+        }
+        
+        // setup pageview
+        self.movingIndex = 0
+        self.pageViewController.setViewControllers([self.viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
     }
     
     // MARK: Private
@@ -114,7 +122,7 @@ open class ViewPager: UIViewController {
                 controller.tableView.contentInset.top = 64 + 40
                 controller.tableView.contentOffset.y = -40
 //                controller.tableView.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
-                controller.tableView.contentOffset = CGPoint(x: 0, y: controller.tableView.contentInset.top)
+//                controller.tableView.contentOffset = CGPoint(x: 0, y: controller.tableView.contentInset.top)
                 continue
             }
             if let controller = controller as? UICollectionViewController {

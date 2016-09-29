@@ -15,10 +15,18 @@ class ArtistViewController: UITableViewController {
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
         
+//        self.tableView.contentOffset = CGPoint(x: 0, y: self.tableView.contentInset.top)
+        
+        self.tableView.contentInset.top = 64 + 40
+        self.tableView.contentOffset = CGPoint(x: 0, y: -self.tableView.contentInset.top)
     }
     
     override func viewDidAppear(_ animated: Bool) {
 //         NSLog("\(tableView.contentInset)")
+        
+//        self.tableView.contentInset.top = 64 + 40
+//        self.tableView.contentOffset = CGPoint(x: 0, y: -self.tableView.contentInset.top)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -30,6 +38,13 @@ class ArtistViewController: UITableViewController {
         super.viewWillDisappear(animated)
         tableView.scrollsToTop = false
     }
+    
+    override func viewDidLayoutSubviews() {
+        //        print("viewDidLayoutSubviews")
+        //        print(self.view.frame)
+        //        tableView.frame = self.view.frame
+    }
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
