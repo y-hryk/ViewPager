@@ -8,15 +8,10 @@
 
 import UIKit
 
-public protocol MenuCellDelegate: class {
-    func menuCellDidTapItem(index: Int)
-}
-
 open class MenuCell: UICollectionViewCell {
     
     open var label: UILabel!
     open var indicator: UIView!
-    open weak var delegate: MenuCellDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -36,7 +31,7 @@ open class MenuCell: UICollectionViewCell {
         self.label.textAlignment = .center
         self.label.lineBreakMode = .byWordWrapping
         self.label.isUserInteractionEnabled = true
-        self.label.backgroundColor = UIColor.orange
+        self.label.backgroundColor = UIColor.clear
         self.contentView.addSubview(self.label)
         
         self.indicator = UIView()
@@ -77,16 +72,6 @@ open class MenuCell: UICollectionViewCell {
             self.label.font = option.menuItemFont
             self.indicator.isHidden = true
         }
-    }
-    
-    // MARK: Selctor
-    func labelTapAction(gesture: UITapGestureRecognizer) {
-        
-        guard let index = gesture.view?.tag else {
-            return
-        }
-        
-        self.delegate?.menuCellDidTapItem(index: index)
     }
     
     static func cellWidth(_ text: String, font: UIFont) -> CGFloat {

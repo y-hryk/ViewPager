@@ -19,6 +19,7 @@ open class ViewPager: UIViewController {
     }
     var movingIndex: Int = 0
     fileprivate var isTapMenuItem = false
+    fileprivate var isDragging = false
     fileprivate var pageViewController: UIPageViewController!
     fileprivate var menuView: MenuView!
     fileprivate var titles = [String]()
@@ -51,7 +52,7 @@ open class ViewPager: UIViewController {
     }
     
     open override func viewDidAppear(_ animated: Bool) {
-        self.menuView.scrollToMenuItemAtIndex(index: 0, animated: false)
+        self.menuView.scrollToMenuItemAtIndex(index: 0)
 //        self.controllerInset()
     }
     
@@ -170,14 +171,14 @@ open class ViewPager: UIViewController {
             
             // To Disable CollectionView UserInteractionEnabled
             weakself.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
-            weakself.menuView.scrollToMenuItemAtIndex(index: weakself.currentIndex!, animated: false)
+            weakself.menuView.scrollToMenuItemAtIndex(index: weakself.currentIndex!)
         }
     }
 }
 
 extension ViewPager: UIPageViewControllerDataSource {
      
-    fileprivate func nextViewController(_ viewController: UIViewController, isAfter: Bool) -> UIViewController? {
+    fileprivate func loadNextViewController(_ viewController: UIViewController, isAfter: Bool) -> UIViewController? {
         guard var index = viewControllers.index(of: viewController) else {
             return nil
         }
@@ -205,11 +206,11 @@ extension ViewPager: UIPageViewControllerDataSource {
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        return nextViewController(viewController, isAfter: true)
+        return loadNextViewController(viewController, isAfter: true)
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        return nextViewController(viewController, isAfter: false)
+        return loadNextViewController(viewController, isAfter: false)
     }
 }
 
@@ -218,17 +219,17 @@ extension ViewPager: UIPageViewControllerDataSource {
 extension ViewPager: UIPageViewControllerDelegate {
     
     public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
-
+//        print("willTransitionTo")
         self.isTapMenuItem = false
         // To Disable CollectionView UserInteractionEnabled
         self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        
+//        print("didFinishAnimating")
         if completed {
             self.movingIndex = self.currentIndex!
-            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!, animated: false)
+            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
         }
         
         // To Disable CollectionView UserInteractionEnabled
@@ -264,9 +265,42 @@ extension ViewPager: UIScrollViewDelegate {
         }
         
         let offsetX = scrollView.contentOffset.x - self.view.frame.width
-        self.menuView.moveIndicator(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
+        
+
+        let ratio = offsetX / self.menuView.frame.width
+        if fabs(ratio) >= 1.0 && self.isDragging {
+            self.movingIndex = targetIndex
+            if !self.option.pagerType.isInfinity() {
+                if targetIndex == viewControllers.count - 1 {
+                    self.movingIndex = viewControllers.count - 1
+                }
+                if targetIndex <= 0 {
+                    self.movingIndex = 0
+                }
+            }
+            self.menuView.scrollToMenuItemAtIndex(index: self.movingIndex)
+            return
+        }
+        
+        self.menuView.updateMenuItemOffset(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
     
     }
+    
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.isDragging = true
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.isDragging = false
+    }
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
+        self.movingIndex = self.currentIndex!
+        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+    }
+
 }
 
 extension ViewPager: MenuViewDelegate {

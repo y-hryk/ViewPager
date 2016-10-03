@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         let albumVC = AlbumViewController()
         albumVC.title = "album"
         let sampleVC1 = SampleViewController()
-        sampleVC1.title = "sample1"
+        sampleVC1.title = "long long long title"
         let sampleVC2 = SampleViewController()
         sampleVC2.title = "sample2"
         let sampleVC3 = SampleViewController()
