@@ -60,7 +60,7 @@ open class MenuCell: UICollectionViewCell {
         self.label.text = datas[index]
         
         self.indicator.backgroundColor = option.menuItemIndicatorColor
-        let width = MenuCell.cellWidth(datas[index], font: option.menuItemFont)
+        let width = MenuCell.cellWidth(datas[index], option: option)
         self.indicator.frame = CGRect(x: 0, y: self.frame.size.height - 2, width: width, height: 2)
         
         if currentIndex % datas.count == index {
@@ -74,14 +74,14 @@ open class MenuCell: UICollectionViewCell {
         }
     }
     
-    static func cellWidth(_ text: String, font: UIFont) -> CGFloat {
+    static func cellWidth(_ text: String, option: ViewPagerOption) -> CGFloat {
 //        CGSize maxSize = CGSizeMake(CGFloat.max, 40);
         
         let style = NSMutableParagraphStyle()
         style.alignment = .center
         style.lineBreakMode = .byWordWrapping
         
-        let attributes =  [NSFontAttributeName : font,
+        let attributes =  [NSFontAttributeName : option.menuItemFont,
                            NSParagraphStyleAttributeName : style]
         
         let options = unsafeBitCast(
@@ -97,8 +97,12 @@ open class MenuCell: UICollectionViewCell {
         
 //        return frame.width + (5 * 2) + (5 * 2)
 //        return 100
-        return CGFloat(Int(frame.width) + (10 * 2))
-//        return CGFloat(Int(frame.width) + 30)
+        
+        if let itemWidth = option.menuItemWidth {
+            return itemWidth
+        } else {
+            return CGFloat(Int(frame.width) + (Int(option.menuItemMargin) * 2))
+        }
     }
 }
 

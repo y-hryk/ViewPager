@@ -8,6 +8,11 @@
 
 import UIKit
 
+protocol ViewPagerProtocol {
+    var viewPagerController: ViewPager { get }
+    var scrollView: UIScrollView { get }
+}
+
 open class ViewPager: UIViewController {
     
     fileprivate var option = ViewPagerOption()

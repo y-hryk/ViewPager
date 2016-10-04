@@ -14,21 +14,19 @@ public struct ViewPagerOption {
     // viewPager
     public var pagerBackgoundColor: UIColor = UIColor.white
     public enum pagerType {
-        case `default`
-        case infinityFixed
-        case infinityFlexible
+        
+        case normal
         case segmeted
+        case infinity
         
         func isInfinity() -> Bool {
             switch self {
-            case .`default`:
+            case .normal:
                 return false
-            case .infinityFixed:
-                fallthrough
-            case .infinityFlexible:
-                return true
             case .segmeted:
                 return false
+            case .infinity:
+                return true
             }
         }
     }
@@ -50,7 +48,7 @@ public struct ViewPagerOption {
     public var menuItemIndicatorColor = UIColor.blue
     public var menuItemShadowColor = UIColor.lightGray
     public var menuItemHeight: CGFloat = 40.0
-    public var menuItemMargin: CGFloat = 5.0
+    public var menuItemMargin: CGFloat = 10.0
     public var menuItemWidth: CGFloat?
     
     

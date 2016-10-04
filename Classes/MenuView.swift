@@ -24,7 +24,7 @@ open class MenuView: UIView {
     fileprivate var currentIndex: Int = 0
     fileprivate var currentOffsetX: CGFloat = 0.0
     fileprivate var currentIndicatorPointX: CGFloat = 0.0
-    fileprivate var itemsWidth: CGFloat = 0.0
+    fileprivate var contentWidth: CGFloat = 0.0
     fileprivate var collectionView : UICollectionView!
     fileprivate var titles = [String]()
 
@@ -144,22 +144,84 @@ open class MenuView: UIView {
         
     }
     
-    fileprivate func updateIndicatorHidden(isHidden: Bool, isHiddenCellIndicator: Bool) {
-       
-        self.collectionView.visibleCells.forEach { (cell) in
-            if let cell = cell as? MenuCell {
-                if self.currentIndex % self.titles.count  == cell.label.tag % self.titles.count {
-                    cell.label.textColor = self.option.menuItemSelectedFontColor
-                    cell.label.font = self.option.menuItemSelectedFont
-                    cell.indicator.isHidden = isHiddenCellIndicator ? true : false
-                } else {
-                    cell.label.textColor = self.option.menuItemFontColor
-                    cell.label.font = self.option.menuItemFont
-                    cell.indicator.isHidden = true
+    fileprivate func moveMenuItem(indexPath: IndexPath, animated: Bool) {
+        if self.option.pagerType.isInfinity() {
+            
+            // infinity
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
+            let itemWidth = MenuCell.cellWidth(self.titles[indexPath.row % self.titles.count], option: self.option)
+            
+            if animated {
+                UIView.animate(withDuration: 0.35) {
+                    self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+                }
+            } else {
+                self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+            }
+            
+        } else {
+            
+            let scrollWidth = self.collectionView.contentSize.width - self.collectionView.frame.size.width
+            let ratio = CGFloat(self.currentIndex) / CGFloat(self.titles.count - 1)
+            
+            var margin: CGFloat = 0.0
+            if self.option.pagerType != .segmeted {
+                margin = self.option.menuItemMargin
+            }
+            
+            // indicator
+            var indicatorPointX: CGFloat = 0.0
+            for (idx, _) in self.titles.enumerated() {
+                if idx <= self.currentIndex && idx != 0 {
+                    let itemWidth = MenuCell.cellWidth(self.titles[idx - 1], option: self.option)
+                    indicatorPointX = CGFloat(indicatorPointX) + CGFloat(itemWidth) + margin
                 }
             }
+            indicatorPointX = CGFloat(indicatorPointX) - (scrollWidth * ratio) + margin
+            self.currentIndicatorPointX = CGFloat(indicatorPointX)
+            let itemWidth = MenuCell.cellWidth(self.titles[indexPath.row % self.titles.count], option: self.option)
+            
+            if animated {
+                
+                UIView.animate(withDuration: 0.35) {
+                    
+                    if self.collectionView.contentSize.width > self.collectionView.frame.size.width {
+                        self.collectionView.contentOffset.x = (scrollWidth * ratio)
+                    }
+                    
+                    self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
+                }
+                
+            } else {
+                
+                if self.collectionView.contentSize.width > self.collectionView.frame.size.width {
+                    self.collectionView.contentOffset.x = (scrollWidth * ratio)
+                }
+                
+                self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
+                
+            }
         }
-        self.indicatorView.isHidden = isHidden
+        
+        self.currentOffsetX = self.collectionView.contentOffset.x
+        
+        if !animated {
+            
+            self.collectionView.visibleCells.forEach { (cell) in
+                if let cell = cell as? MenuCell {
+                    if self.currentIndex % self.titles.count  == cell.label.tag % self.titles.count {
+                        cell.label.textColor = self.option.menuItemSelectedFontColor
+                        cell.label.font = self.option.menuItemSelectedFont
+                        cell.indicator.isHidden = false
+                    } else {
+                        cell.label.textColor = self.option.menuItemFontColor
+                        cell.label.font = self.option.menuItemFont
+                        cell.indicator.isHidden = true
+                    }
+                }
+            }
+            self.indicatorView.isHidden = true
+        }
     }
     
     fileprivate func scrollToMenuItemAtIndexUserTap(indexPath: IndexPath, animated: Bool) {
@@ -188,67 +250,6 @@ open class MenuView: UIView {
         self.delegate?.menuViewDidTapMeunItem(index: currentIndex, direction: direction)
     }
     
-    fileprivate func moveMenuItem(indexPath: IndexPath, animated: Bool) {
-        if self.option.pagerType.isInfinity() {
-            
-            // infinity
-            self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: animated)
-            let itemWidth = MenuCell.cellWidth(self.titles[indexPath.row % self.titles.count], font: self.option.menuItemFont)
-            
-            if animated {
-                UIView.animate(withDuration: 0.35) {
-                    self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
-                }
-            } else {
-                self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
-            }
-            
-        } else {
-            
-            let scrollWidth = self.collectionView.contentSize.width - self.collectionView.frame.size.width
-            let ratio = CGFloat(self.currentIndex) / CGFloat(self.titles.count - 1)
-            
-            // indicator
-            var indicatorPointX: CGFloat = 0.0
-            for (idx, _) in self.titles.enumerated() {
-                if idx <= self.currentIndex && idx != 0 {
-                    let itemWidth = MenuCell.cellWidth(self.titles[idx - 1], font: self.option.menuItemFont)
-                    indicatorPointX = CGFloat(indicatorPointX) + CGFloat(itemWidth) + self.option.menuItemMargin
-                }
-            }
-            indicatorPointX = CGFloat(indicatorPointX) - (scrollWidth * ratio) + self.option.menuItemMargin
-            self.currentIndicatorPointX = CGFloat(indicatorPointX)
-            let itemWidth = MenuCell.cellWidth(self.titles[indexPath.row % self.titles.count], font: self.option.menuItemFont)
-            
-            if animated {
-            
-                UIView.animate(withDuration: 0.35) {
-                    
-                    if self.collectionView.contentSize.width > self.collectionView.frame.size.width {
-                        self.collectionView.contentOffset.x = (scrollWidth * ratio)
-                    }
-                    
-                    self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
-                }
-
-            } else {
-                
-                if self.collectionView.contentSize.width > self.collectionView.frame.size.width {
-                    self.collectionView.contentOffset.x = (scrollWidth * ratio)
-                }
-                
-                self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
-                
-            }
-        }
-        
-        self.currentOffsetX = self.collectionView.contentOffset.x
-        
-        if !animated {
-            self.updateIndicatorHidden(isHidden: true, isHiddenCellIndicator: false)
-        }
-    }
-    
     // MARK: Public
     open func scrollToMenuItemAtIndex(index: Int) {
         
@@ -266,6 +267,7 @@ open class MenuView: UIView {
             }
         }
         
+        
         if self.currentOffsetX == 0 {
             self.currentOffsetX = self.collectionView.contentOffset.x
         }
@@ -280,8 +282,8 @@ open class MenuView: UIView {
         if self.option.pagerType.isInfinity() {
            
             // infinity
-            let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: self.option.menuItemFont)
-            let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], font: self.option.menuItemFont)
+            let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], option: self.option)
+            let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], option: self.option)
             
             let diffItemWidth = fabs(ratio) * (nextItemWidth - currentItemWidth)
             let indicatorWidth = currentItemWidth + diffItemWidth
@@ -291,14 +293,19 @@ open class MenuView: UIView {
             
             let scrollOffsetX = ratio * itemOffetX
             
-            self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX + (self.option.menuItemMargin * ratio)
+            var margin: CGFloat = 0.0
+            if self.option.pagerType != .segmeted {
+                margin = self.option.menuItemMargin
+            }
+            
+            self.collectionView.contentOffset.x = self.currentOffsetX + scrollOffsetX + (margin * ratio)
 
         } else {
             
             if nextIndex >= 0 && nextIndex < self.titles.count {
                 
-                let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], font: self.option.menuItemFont)
-                let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], font: self.option.menuItemFont)
+                let currentItemWidth = MenuCell.cellWidth(self.titles[currentIndex], option: self.option)
+                let nextItemWidth = MenuCell.cellWidth(self.titles[nextIndex], option: self.option)
                 
                 let diffItemWidth = fabs(ratio) * (nextItemWidth - currentItemWidth)
                 let indicatorWidth = currentItemWidth + diffItemWidth
@@ -319,8 +326,13 @@ open class MenuView: UIView {
                 
                 let itemWidth = ratio < 0 ? nextItemWidth : currentItemWidth
                 
+                var margin: CGFloat = 0.0
+                if self.option.pagerType != .segmeted {
+                    margin = self.option.menuItemMargin
+                }
+                
                 let indicatorPointX = (itemWidth * ratio)
-                    + (self.option.menuItemMargin * ratio)
+                    + (margin * ratio)
                     - (currentScrollWidth * ratio)
                     + self.currentIndicatorPointX
                 
@@ -370,15 +382,14 @@ extension MenuView: UICollectionViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
 //        print("\(scrollView.contentOffset.x)")
         if self.option.pagerType.isInfinity() {
-            if self.itemsWidth == 0.0 {
-                self.itemsWidth = floor(scrollView.contentSize.width / self.factor)
+            if self.contentWidth == 0.0 {
+                self.contentWidth = floor(scrollView.contentSize.width / self.factor)
             }
             
-            if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.itemsWidth * 2.0) {
-                scrollView.contentOffset.x = self.itemsWidth
+            if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.contentWidth * 2.0) {
+                scrollView.contentOffset.x = self.contentWidth
             }
         }
-
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -392,21 +403,32 @@ extension MenuView: UICollectionViewDelegate {
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+        
+        if self.option.pagerType == .segmeted { return 0.0 }
         return self.option.menuItemMargin
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+        
+        if self.option.pagerType == .segmeted {
+            return UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+        }
         return UIEdgeInsets(top: 0.0, left: self.option.menuItemMargin, bottom: 0.0, right: self.option.menuItemMargin)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
         
         let index = (indexPath as NSIndexPath).row % self.titles.count
-        let width = MenuCell.cellWidth(self.titles[index], font: self.option.menuItemFont)
+        if self.option.pagerType == .segmeted {
+            self.option.menuItemWidth = self.frame.size.width / CGFloat(self.titles.count)
+        }
+        let width = MenuCell.cellWidth(self.titles[index], option: self.option)
         return CGSize(width: width, height: self.frame.height)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+        
+        if self.option.pagerType == .segmeted { return 0.0 }
         return self.option.menuItemMargin
     }
     
