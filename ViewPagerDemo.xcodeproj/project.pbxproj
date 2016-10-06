@@ -12,6 +12,9 @@
 		D03992C61D76C509008695AA /* SampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03992C51D76C509008695AA /* SampleViewController.swift */; };
 		D03992C81D76D007008695AA /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03992C71D76D007008695AA /* MenuView.swift */; };
 		D03992CE1D781E99008695AA /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03992CD1D781E99008695AA /* MenuCell.swift */; };
+		D04209421DA378D8004C52C4 /* Demo1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04209411DA378D8004C52C4 /* Demo1ViewController.swift */; };
+		D04209441DA378F2004C52C4 /* Demo2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04209431DA378F2004C52C4 /* Demo2ViewController.swift */; };
+		D04209461DA3790E004C52C4 /* Demo3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04209451DA3790E004C52C4 /* Demo3ViewController.swift */; };
 		D0665FEC1D830C69004BCB13 /* ViewPagerOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0665FEB1D830C69004BCB13 /* ViewPagerOption.swift */; };
 		D09725C61D76731A0000204F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09725C51D76731A0000204F /* AppDelegate.swift */; };
 		D09725C81D76731A0000204F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09725C71D76731A0000204F /* ViewController.swift */; };
@@ -27,6 +30,9 @@
 		D03992C51D76C509008695AA /* SampleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleViewController.swift; sourceTree = "<group>"; };
 		D03992C71D76D007008695AA /* MenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		D03992CD1D781E99008695AA /* MenuCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
+		D04209411DA378D8004C52C4 /* Demo1ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Demo1ViewController.swift; sourceTree = "<group>"; };
+		D04209431DA378F2004C52C4 /* Demo2ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Demo2ViewController.swift; sourceTree = "<group>"; };
+		D04209451DA3790E004C52C4 /* Demo3ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Demo3ViewController.swift; sourceTree = "<group>"; };
 		D0665FEB1D830C69004BCB13 /* ViewPagerOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewPagerOption.swift; sourceTree = "<group>"; };
 		D09725C21D76731A0000204F /* ViewPagerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ViewPagerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D09725C51D76731A0000204F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +77,9 @@
 			children = (
 				D09725C51D76731A0000204F /* AppDelegate.swift */,
 				D09725C71D76731A0000204F /* ViewController.swift */,
+				D04209411DA378D8004C52C4 /* Demo1ViewController.swift */,
+				D04209431DA378F2004C52C4 /* Demo2ViewController.swift */,
+				D04209451DA3790E004C52C4 /* Demo3ViewController.swift */,
 				D09725DC1D768C470000204F /* ArtistViewController.swift */,
 				D039929F1D76B17C008695AA /* AlbumViewController.swift */,
 				D03992A11D76B1C3008695AA /* PlayListViewController.swift */,
@@ -168,12 +177,15 @@
 				D03992A21D76B1C3008695AA /* PlayListViewController.swift in Sources */,
 				D03992A01D76B17C008695AA /* AlbumViewController.swift in Sources */,
 				D09725C81D76731A0000204F /* ViewController.swift in Sources */,
+				D04209421DA378D8004C52C4 /* Demo1ViewController.swift in Sources */,
 				D0665FEC1D830C69004BCB13 /* ViewPagerOption.swift in Sources */,
 				D09725C61D76731A0000204F /* AppDelegate.swift in Sources */,
 				D03992CE1D781E99008695AA /* MenuCell.swift in Sources */,
 				D03992C81D76D007008695AA /* MenuView.swift in Sources */,
 				D09725DF1D76AB640000204F /* ViewPager.swift in Sources */,
 				D03992C61D76C509008695AA /* SampleViewController.swift in Sources */,
+				D04209461DA3790E004C52C4 /* Demo3ViewController.swift in Sources */,
+				D04209441DA378F2004C52C4 /* Demo2ViewController.swift in Sources */,
 				D09725DD1D768C470000204F /* ArtistViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

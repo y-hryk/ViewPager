@@ -27,6 +27,22 @@ open class MenuView: UIView {
     fileprivate var contentWidth: CGFloat = 0.0
     fileprivate var collectionView : UICollectionView!
     fileprivate var titles = [String]()
+    
+    fileprivate var indicatorPositionY: CGFloat {
+        if self.option.indicatorType == .line {
+            return self.frame.height - 1.5
+        } else {
+            return 5
+        }
+    }
+    
+    fileprivate var indicatorHeight: CGFloat {
+        if self.option.indicatorType == .line {
+            return 1.5
+        } else {
+            return self.option.menuItemHeight - (5 * 2)
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,13 +61,22 @@ open class MenuView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     // MARK: Private
     fileprivate func setupViews() {
+        
+        self.backgroundColor = self.option.backgroundColor
+        
+        self.indicatorView = UIView()
+        self.indicatorView.frame = CGRect(x: (self.frame.width / 2), y: self.indicatorPositionY, width: 0, height: self.indicatorHeight)
+        self.indicatorView.backgroundColor = self.option.menuItemIndicatorColor
+        self.indicatorView.layer.cornerRadius = self.option.indicatorRadius
+        self.addSubview(self.indicatorView)
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         self.collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        self.collectionView.backgroundColor = UIColor.white
+        self.collectionView.backgroundColor = UIColor.clear
         self.collectionView.register(MenuCell.self, forCellWithReuseIdentifier: "MenuCell")
         self.collectionView.showsHorizontalScrollIndicator = false
         self.collectionView.alwaysBounceHorizontal = true
@@ -64,12 +89,7 @@ open class MenuView: UIView {
         let shadowView = UIView()
         shadowView.backgroundColor = UIColor.lightGray
         self.addSubview(shadowView)
-        
-        self.indicatorView = UIView()
-        self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (80 / 2), y: self.frame.height - 2, width: 80, height: 2)
-        self.indicatorView.backgroundColor = UIColor.blue
-        self.addSubview(self.indicatorView)
-        
+    
         
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
@@ -86,6 +106,10 @@ open class MenuView: UIView {
             NSLayoutConstraint(item: shadowView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0.5),
             NSLayoutConstraint(item: shadowView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1.0, constant: 0.5)
         ])
+        
+        if self.option.pagerType == .segmeted {
+            self.collectionView.bounces = false
+        }
     }
 
     fileprivate func colorToRGBA(color: UIColor) -> ((red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) {
@@ -102,15 +126,15 @@ open class MenuView: UIView {
         let selectedColor = self.colorToRGBA(color: self.option.menuItemSelectedFontColor)
         
         let ratioAbs = fabs(ratio)
-        let currentColor = UIColor(red:     color.red   * ratioAbs       + selectedColor.red    * (1 - ratioAbs),
-                                   green:   color.green * ratioAbs       + selectedColor.green  * (1 - ratioAbs),
-                                   blue:    color.blue  * ratioAbs       + selectedColor.blue   * (1 - ratioAbs),
-                                   alpha:   color.alpha * ratioAbs       + selectedColor.alpha  * (1 - ratioAbs))
+        let currentColor = UIColor(red:     color.red   * ratioAbs          + selectedColor.red    * (1.0 - ratioAbs),
+                                   green:   color.green * ratioAbs          + selectedColor.green  * (1.0 - ratioAbs),
+                                   blue:    color.blue  * ratioAbs          + selectedColor.blue   * (1.0 - ratioAbs),
+                                   alpha:   color.alpha * ratioAbs          + selectedColor.alpha  * (1.0 - ratioAbs))
         
-        let nextColor    = UIColor(red:     color.red   * (1 - ratioAbs) + selectedColor.red    * ratioAbs,
-                                   green:   color.green * (1 - ratioAbs) + selectedColor.green  * ratioAbs,
-                                   blue:    color.blue  * (1 - ratioAbs) + selectedColor.blue   * ratioAbs,
-                                   alpha:   color.alpha * (1 - ratioAbs) + selectedColor.alpha  * ratioAbs)
+        let nextColor    = UIColor(red:     color.red   * (1.0 - ratioAbs)  + selectedColor.red    * ratioAbs,
+                                   green:   color.green * (1.0 - ratioAbs)  + selectedColor.green  * ratioAbs,
+                                   blue:    color.blue  * (1.0 - ratioAbs)  + selectedColor.blue   * ratioAbs,
+                                   alpha:   color.alpha * (1.0 - ratioAbs)  + selectedColor.alpha  * ratioAbs)
         
         // Current itemFont
         let currentIndexPath = IndexPath(item: self.option.pagerType.isInfinity() ? currentIndex + self.titles.count : currentIndex, section: 0)
@@ -125,14 +149,16 @@ open class MenuView: UIView {
         
         // Next ItemFont
         var nextIndexPath = IndexPath(item: self.option.pagerType.isInfinity() ? nextIndex + self.titles.count : nextIndex, section: 0)
+        if self.option.pagerType.isInfinity() {
         
-        if currentIndex == self.titles.count - 1 && nextIndex == 0 {
-            nextIndexPath = IndexPath(item: self.titles.count * 2, section: 0)
+            if currentIndex == self.titles.count - 1 && nextIndex == 0 {
+                nextIndexPath = IndexPath(item: self.titles.count * 2, section: 0)
+            }
+            if nextIndex == self.titles.count - 1 && currentIndex == 0 {
+                nextIndexPath = IndexPath(item: self.titles.count - 1, section: 0)
+            }
+            
         }
-        if nextIndex == self.titles.count - 1 && currentIndex == 0 {
-            nextIndexPath = IndexPath(item: self.titles.count - 1, section: 0)
-        }
-        
         if let nextCell = self.collectionView.cellForItem(at: nextIndexPath) as? MenuCell {
             nextCell.label.textColor = nextColor
             if ratioAbs > 0.5 {
@@ -153,10 +179,10 @@ open class MenuView: UIView {
             
             if animated {
                 UIView.animate(withDuration: 0.35) {
-                    self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+                    self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.indicatorPositionY, width: itemWidth, height: self.indicatorHeight)
                 }
             } else {
-                self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.frame.height - 2, width: itemWidth, height: 2)
+                self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (itemWidth / 2), y: self.indicatorPositionY, width: itemWidth, height: self.indicatorHeight)
             }
             
         } else {
@@ -189,7 +215,7 @@ open class MenuView: UIView {
                         self.collectionView.contentOffset.x = (scrollWidth * ratio)
                     }
                     
-                    self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
+                    self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.indicatorPositionY, width: itemWidth, height: self.indicatorHeight)
                 }
                 
             } else {
@@ -198,7 +224,7 @@ open class MenuView: UIView {
                     self.collectionView.contentOffset.x = (scrollWidth * ratio)
                 }
                 
-                self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.frame.height - 2, width: itemWidth, height: 2)
+                self.indicatorView.frame = CGRect(x: self.currentIndicatorPointX , y: self.indicatorPositionY, width: itemWidth, height: self.indicatorHeight)
                 
             }
         }
@@ -288,7 +314,7 @@ open class MenuView: UIView {
             let diffItemWidth = fabs(ratio) * (nextItemWidth - currentItemWidth)
             let indicatorWidth = currentItemWidth + diffItemWidth
             
-            self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (indicatorWidth / 2), y: self.frame.height - 2, width: indicatorWidth, height: 2)
+            self.indicatorView.frame = CGRect(x: (self.frame.width / 2) - (indicatorWidth / 2), y: self.indicatorPositionY, width: indicatorWidth, height: self.indicatorHeight)
             let itemOffetX = (currentItemWidth / 2.0) + (nextItemWidth / 2.0)
             
             let scrollOffsetX = ratio * itemOffetX
@@ -336,7 +362,7 @@ open class MenuView: UIView {
                     - (currentScrollWidth * ratio)
                     + self.currentIndicatorPointX
                 
-                self.indicatorView.frame = CGRect(x: indicatorPointX , y: self.frame.height - 2, width: indicatorWidth, height: 2)
+                self.indicatorView.frame = CGRect(x: indicatorPointX , y: self.indicatorPositionY, width: indicatorWidth, height: self.indicatorHeight)
             }
 
         }

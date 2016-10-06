@@ -30,14 +30,20 @@ public struct ViewPagerOption {
             }
         }
     }
-    public var pagerType: pagerType = .segmeted
+    public var pagerType: pagerType = .normal
     
     public enum pagerLayoutType {
         case fullScreen
         case flexible
     }
     
+    public enum indicatorType {
+        case line
+        case box
+    }
+    
     public var pagerLayoutType: pagerLayoutType = .fullScreen
+    public var indicatorType: indicatorType = .line
     
     // menuView
     public var backgroundColor = UIColor.white
@@ -50,6 +56,6 @@ public struct ViewPagerOption {
     public var menuItemHeight: CGFloat = 40.0
     public var menuItemMargin: CGFloat = 10.0
     public var menuItemWidth: CGFloat?
-    
+    public var indicatorRadius: CGFloat = 0.0
     
 }

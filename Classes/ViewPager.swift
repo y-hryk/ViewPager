@@ -13,28 +13,48 @@ protocol ViewPagerProtocol {
     var scrollView: UIScrollView { get }
 }
 
+public protocol ViewPagerDelegate: class {
+//    func viewPagerWillBeginDragging(viewPager: ViewPager)
+    func viewPagerDidEndDragging(viewPager: ViewPager)
+}
+
 open class ViewPager: UIViewController {
+
+    // publlic
+    open var selectedIndex: Int = 0
+    
+    // Handler
+    open var viewPagerWillBeginDraggingHandler : ((ViewPager) -> Void)?
+    open var viewPagerDidEndDraggingHandler : ((ViewPager) -> Void)?
+    
+//    open weak var delegate: Set<ViewPagerDelegate>()?
+    // Views
+    fileprivate var pageViewController: UIPageViewController!
+    fileprivate var menuView: MenuView!
+    
+    // other
+    fileprivate var titles = [String]()
+    fileprivate var viewControllers = [UIViewController]()
     
     fileprivate var option = ViewPagerOption()
-    var currentIndex: Int? {
+    fileprivate var currentIndex: Int {
         guard let viewController = self.pageViewController.viewControllers?.first else {
             return 0
         }
-        return self.viewControllers.map{ $0 }.index(of: viewController)
+        return self.viewControllers.map{ $0 }.index(of: viewController)!
     }
-    var movingIndex: Int = 0
+    fileprivate var draggingIndex: Int?         // current dragging controller index
     fileprivate var isTapMenuItem = false
     fileprivate var isDragging = false
-    fileprivate var pageViewController: UIPageViewController!
-    fileprivate var menuView: MenuView!
-    fileprivate var titles = [String]()
-    fileprivate var viewControllers = [UIViewController]()
+    
+    fileprivate var navigationBarOffsetY : CGFloat = 0.0
+    fileprivate var beforeOffsetY : CGFloat = 0.0
     
     override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    init(controllers: [UIViewController], option: ViewPagerOption, parentViewController: ViewController) {
+    init(controllers: [UIViewController], option: ViewPagerOption, parentViewController: UIViewController) {
         super.init(nibName: nil, bundle: nil)
         
         parentViewController.addChildViewController(self)
@@ -56,9 +76,18 @@ open class ViewPager: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    open override func viewDidAppear(_ animated: Bool) {
-        self.menuView.scrollToMenuItemAtIndex(index: 0)
-//        self.controllerInset()
+    open override func viewWillAppear(_ animated: Bool) {
+//        print("viewWillAppear")
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+//        print("viewWillDisappear")
+        
+        if let originY = self.navigationController?.navigationBar.frame.origin.y {
+            if originY < 0.0 {
+                self.updateNavigation(ratio: 0)
+            }
+        }
     }
     
     override open func viewDidLoad() {
@@ -77,7 +106,6 @@ open class ViewPager: UIViewController {
      
 //        menuView = MenuView(frame: CGRectMake(0, 64, self.view.frame.width, 40))
         self.menuView = MenuView(titles: self.titles, option: self.option)
-        self.menuView.backgroundColor = UIColor.clear
         self.menuView.delegate = self
         self.view.addSubview(self.menuView)
         
@@ -115,9 +143,12 @@ open class ViewPager: UIViewController {
                 ])
         }
         
+        self.view.layoutIfNeeded()
+        self.draggingIndex = selectedIndex
+        self.menuView.scrollToMenuItemAtIndex(index: self.draggingIndex!)
+        
         // setup pageview
-        self.movingIndex = 0
-        self.pageViewController.setViewControllers([self.viewControllers[self.movingIndex]], direction: .forward, animated: true, completion: nil)
+        self.pageViewController.setViewControllers([self.viewControllers[self.selectedIndex]], direction: .forward, animated: false, completion: nil)
     }
     
     // MARK: Private
@@ -159,13 +190,13 @@ open class ViewPager: UIViewController {
     open func setupPageControllerAtIndex(index: Int, direction: UIPageViewControllerNavigationDirection) {
         self.isTapMenuItem = true
         
-        if (index == self.currentIndex!) {
+        if (index == self.currentIndex) {
             self.isTapMenuItem = false
             self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
             return
         }
         
-        self.movingIndex = index
+        self.draggingIndex = index
         self.pageViewController.setViewControllers([viewControllers[index]], direction: direction, animated: true) { [weak self] (isFinish) in
             
             guard let weakself = self else {
@@ -176,8 +207,83 @@ open class ViewPager: UIViewController {
             
             // To Disable CollectionView UserInteractionEnabled
             weakself.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
-            weakself.menuView.scrollToMenuItemAtIndex(index: weakself.currentIndex!)
+            weakself.menuView.scrollToMenuItemAtIndex(index: weakself.currentIndex)
+            
+            weakself.viewPagerDidEndDraggingHandler?(weakself)
         }
+    }
+    
+    open func syncScrollViewOffset(scrollView: UIScrollView) {
+        
+    }
+    
+    open func updateScrollViewOffset(scrollView: UIScrollView) {
+        
+        let offsetY = scrollView.contentOffset.y + 104
+        let ratio = fabs(offsetY) / 104
+        
+////        print(scrollView.contentOffset.y)
+//        
+//        if offsetY <= 104 && offsetY >= 0 {
+//            self.navigationController?.navigationBar.frame.origin.y =  -(ratio * 44) + 20
+////            print(scrollView.contentOffset.y)
+//        } else {
+//            self.navigationController?.navigationBar.frame.origin.y = 20
+//        }
+//        if offsetY < 0 {
+//            self.navigationBarOffsetY = 0
+//        }
+        
+        
+        if offsetY > self.beforeOffsetY {
+            // 下に引っ張る
+            self.navigationBarOffsetY += 1
+        } else {
+            // 上に引っ張る
+            self.navigationBarOffsetY -= 1
+        }
+        
+        print(offsetY)
+        
+//        if (offsetY > 0) {
+//            if (offsetY >= 44) {
+//                self.updateNavigation(ratio: 1)
+//            } else {
+//                self.updateNavigation(ratio: (offsetY / 44))
+//            }
+//        } else {
+//            self.updateNavigation(ratio: 0)
+////            navigationBarOffsetY = 0.0
+//        }
+        
+        self.beforeOffsetY = offsetY
+
+        if self.navigationBarOffsetY > 150 {
+            self.updateNavigation(ratio: 1)
+        } else if self.navigationBarOffsetY > 130  {
+            self.updateNavigation(ratio: (offsetY / 44))
+        } else {
+            
+            self.updateNavigation(ratio: 0)
+        }
+        
+    }
+    
+    fileprivate func updateNavigation(ratio: CGFloat) {
+        
+        self.navigationController?.navigationBar.transform = CGAffineTransform(translationX: 0, y: ratio * -44)
+        self.menuView.transform = CGAffineTransform(translationX: 0, y: ratio * -44)
+        
+        
+        let alphaRatio = 1 - ratio
+        
+        self.navigationController?.navigationBar.subviews.forEach({
+            
+            if NSStringFromClass(type(of: $0)) != "_UINavigationBarBackground" {
+                $0.alpha = alphaRatio
+            }
+
+        })
     }
 }
 
@@ -224,20 +330,21 @@ extension ViewPager: UIPageViewControllerDataSource {
 extension ViewPager: UIPageViewControllerDelegate {
     
     public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
-//        print("willTransitionTo")
+
         self.isTapMenuItem = false
-        // To Disable CollectionView UserInteractionEnabled
+        self.viewPagerWillBeginDraggingHandler?(self)
         self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: false)
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-//        print("didFinishAnimating")
-        if completed {
-            self.movingIndex = self.currentIndex!
-            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
+
+        if completed && self.draggingIndex != self.currentIndex {
+            self.draggingIndex = self.currentIndex
+            self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex)
+            
+            self.viewPagerDidEndDraggingHandler?(self)
         }
         
-        // To Disable CollectionView UserInteractionEnabled
         self.menuView.updateCollectionViewUserInteractionEnabled(userInteractionEnabled: true)
     }
 }
@@ -253,9 +360,9 @@ extension ViewPager: UIScrollViewDelegate {
 
         var targetIndex = 0
         if scrollView.contentOffset.x > self.view.frame.width {
-            targetIndex = self.movingIndex + 1
+            targetIndex = self.draggingIndex! + 1
         } else {
-            targetIndex = self.movingIndex - 1
+            targetIndex = self.draggingIndex! - 1
         }
         
         // infinity setting
@@ -274,23 +381,22 @@ extension ViewPager: UIScrollViewDelegate {
 
         let ratio = offsetX / self.menuView.frame.width
         if fabs(ratio) >= 1.0 && self.isDragging {
-            self.movingIndex = targetIndex
+            self.draggingIndex = targetIndex
             if !self.option.pagerType.isInfinity() {
                 if targetIndex == viewControllers.count - 1 {
-                    self.movingIndex = viewControllers.count - 1
+                    self.draggingIndex = viewControllers.count - 1
                 }
                 if targetIndex <= 0 {
-                    self.movingIndex = 0
+                    self.draggingIndex = 0
                 }
             }
-            self.menuView.scrollToMenuItemAtIndex(index: self.movingIndex)
+            self.menuView.scrollToMenuItemAtIndex(index: self.draggingIndex!)
             return
         }
         
-        self.menuView.updateMenuItemOffset(currentIndex: self.movingIndex, nextIndex: targetIndex, offsetX: offsetX)
+        self.menuView.updateMenuItemOffset(currentIndex: self.draggingIndex!, nextIndex: targetIndex, offsetX: offsetX)
     
     }
-    
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.isDragging = true
@@ -302,14 +408,13 @@ extension ViewPager: UIScrollViewDelegate {
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         
-        self.movingIndex = self.currentIndex!
-        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex!)
     }
 
 }
 
 extension ViewPager: MenuViewDelegate {
     public func menuViewDidTapMeunItem(index: Int, direction: UIPageViewControllerNavigationDirection) {
+        self.viewPagerWillBeginDraggingHandler?(self)
         self.setupPageControllerAtIndex(index: index, direction: direction)
     }
     

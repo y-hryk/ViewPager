@@ -24,18 +24,19 @@ open class MenuCell: UICollectionViewCell {
     
     // MARK: Private
     func setupViews() {
-        self.backgroundColor = UIColor.white
+        self.backgroundColor = UIColor.clear
+        
+        self.indicator = UIView()
+        self.contentView.addSubview(self.indicator)
         
         self.label = UILabel()
         self.label.textColor = UIColor.black
         self.label.textAlignment = .center
-        self.label.lineBreakMode = .byWordWrapping
+        self.label.lineBreakMode = .byTruncatingTail
         self.label.isUserInteractionEnabled = true
         self.label.backgroundColor = UIColor.clear
         self.contentView.addSubview(self.label)
         
-        self.indicator = UIView()
-        self.contentView.addSubview(self.indicator)
     
         self.label.translatesAutoresizingMaskIntoConstraints = false
         self.addConstraints([
@@ -61,7 +62,13 @@ open class MenuCell: UICollectionViewCell {
         
         self.indicator.backgroundColor = option.menuItemIndicatorColor
         let width = MenuCell.cellWidth(datas[index], option: option)
-        self.indicator.frame = CGRect(x: 0, y: self.frame.size.height - 2, width: width, height: 2)
+        
+        self.indicator.layer.cornerRadius = option.indicatorRadius
+        if option.indicatorType == .line {
+            self.indicator.frame = CGRect(x: 0, y: self.frame.size.height - 1.5, width: width, height: 1.5)
+        } else {
+            self.indicator.frame = CGRect(x: 0, y: 5, width: width, height: 30)
+        }
         
         if currentIndex % datas.count == index {
             self.label.textColor = option.menuItemSelectedFontColor

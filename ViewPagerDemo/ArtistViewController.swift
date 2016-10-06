@@ -19,6 +19,17 @@ class ArtistViewController: UITableViewController {
         
         self.tableView.contentInset.top = 64 + 40
         self.tableView.contentOffset = CGPoint(x: 0, y: -self.tableView.contentInset.top)
+        
+        
+        self.viewPagerController.viewPagerWillBeginDraggingHandler = { viewpager -> Void in
+            print("viewPagerWillBeginDraggingHandler")
+        }
+        
+        self.viewPagerController.viewPagerDidEndDraggingHandler = { viewpager -> Void in
+            print("viewPagerDidEndDraggingHandler")
+        }
+
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -117,5 +128,29 @@ class ArtistViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let vc = UIViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
+        
+        print(self.parent?.parent)
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        self.viewPagerController.updateScrollViewOffset(scrollView: scrollView)
+    }
 
+}
+
+extension ArtistViewController: ViewPagerProtocol {
+    
+    var viewPagerController: ViewPager {
+        return self.parent?.parent as! ViewPager
+    }
+    
+    var scrollView: UIScrollView {
+        return self.tableView
+    }
 }
