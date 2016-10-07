@@ -22,11 +22,11 @@ class ArtistViewController: UITableViewController {
         
         
         self.viewPagerController.viewPagerWillBeginDraggingHandler = { viewpager -> Void in
-            print("viewPagerWillBeginDraggingHandler")
+//            print("viewPagerWillBeginDraggingHandler")
         }
         
         self.viewPagerController.viewPagerDidEndDraggingHandler = { viewpager -> Void in
-            print("viewPagerDidEndDraggingHandler")
+//            print("viewPagerDidEndDraggingHandler")
         }
 
         
@@ -43,6 +43,8 @@ class ArtistViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.scrollsToTop = true
+        
+        self.viewPagerController.syncScrollViewOffset(scrollView: self.tableView)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -141,7 +143,6 @@ class ArtistViewController: UITableViewController {
         
         self.viewPagerController.updateScrollViewOffset(scrollView: scrollView)
     }
-
 }
 
 extension ArtistViewController: ViewPagerProtocol {

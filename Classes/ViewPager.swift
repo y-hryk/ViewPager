@@ -49,6 +49,7 @@ open class ViewPager: UIViewController {
     
     fileprivate var navigationBarOffsetY : CGFloat = 0.0
     fileprivate var beforeOffsetY : CGFloat = 0.0
+    fileprivate var navigationHiddenRatio : CGFloat = 0.0
     
     override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -215,15 +216,27 @@ open class ViewPager: UIViewController {
     
     open func syncScrollViewOffset(scrollView: UIScrollView) {
         
+        
+        let offsetY = scrollView.contentOffset.y + 104
+        
+        print("offsetY : \(offsetY)")
+        print("scrollView.contentOffset.y : \(scrollView.contentOffset.y)")
+        if offsetY <= 0 && self.navigationBarOffsetY > 0 {
+            scrollView.contentOffset.y = -40 - 20
+        }
+        
     }
     
     open func updateScrollViewOffset(scrollView: UIScrollView) {
         
+        if self.isDragging {
+            return;
+        }
         let offsetY = scrollView.contentOffset.y + 104
         let ratio = fabs(offsetY) / 104
         
-////        print(scrollView.contentOffset.y)
-//        
+//        print(scrollView.contentOffset.y)
+//
 //        if offsetY <= 104 && offsetY >= 0 {
 //            self.navigationController?.navigationBar.frame.origin.y =  -(ratio * 44) + 20
 ////            print(scrollView.contentOffset.y)
@@ -235,37 +248,84 @@ open class ViewPager: UIViewController {
 //        }
         
         
+        print(offsetY)
+        self.navigationBarOffsetY += offsetY - self.beforeOffsetY
+        
         if offsetY > self.beforeOffsetY {
             // 下に引っ張る
-            self.navigationBarOffsetY += 1
+//            print("scrollView.contentOffset.y \(scrollView.contentOffset.y)")
+            if offsetY > 0 && offsetY < (scrollView.contentSize.height - scrollView.frame.size.height + 104) {
+                self.navigationHiddenRatio += 1
+//                NSLog("offsetY \(offsetY) + 1")
+            }
+            
+//            if offsetY >= 50 {
+//                self.navigationHiddenRatio = 50
+//            }
+            
         } else {
             // 上に引っ張る
-            self.navigationBarOffsetY -= 1
+            
+            if offsetY > 0 && offsetY < (scrollView.contentSize.height - scrollView.frame.size.height + 104) {
+                self.navigationHiddenRatio -= 1
+//                NSLog(">>>>>> offsetY \(offsetY) - 1")
+            }
+            
+//            if offsetY >= scrollView.contentSize.height {
+//                self.navigationHiddenRatio = 50
+//            }
         }
         
-        print(offsetY)
+//        if self.navigationHiddenRatio >= 50 {
+//            self.navigationHiddenRatio = 50
+//        }
+//
+      
+
         
-//        if (offsetY > 0) {
-//            if (offsetY >= 44) {
+//        print(self.navigationHiddenRatio)
+//        print(self.navigationHiddenRatio)
+        
+        self.beforeOffsetY = offsetY
+  
+//        if (self.navigationBarOffsetY > 0 + 0) {
+//            if (self.navigationBarOffsetY >= 44 + 0) {
 //                self.updateNavigation(ratio: 1)
 //            } else {
-//                self.updateNavigation(ratio: (offsetY / 44))
+//                self.updateNavigation(ratio: ((self.navigationBarOffsetY - 0) / 44))
+////                self.navigationBarOffsetY = offsetY
 //            }
-//        } else {
+//        }
+//        else {
 //            self.updateNavigation(ratio: 0)
 ////            navigationBarOffsetY = 0.0
 //        }
         
-        self.beforeOffsetY = offsetY
 
-        if self.navigationBarOffsetY > 150 {
-            self.updateNavigation(ratio: 1)
-        } else if self.navigationBarOffsetY > 130  {
-            self.updateNavigation(ratio: (offsetY / 44))
+        
+        if (offsetY > 0) {
+            if (offsetY >= 44) {
+                self.updateNavigation(ratio: 1)
+                self.navigationBarOffsetY = 44
+            } else {
+                self.updateNavigation(ratio: (offsetY / 44))
+                self.navigationBarOffsetY = offsetY
+            }
         } else {
-            
             self.updateNavigation(ratio: 0)
+            navigationBarOffsetY = 0.0
         }
+        
+//        self.beforeOffsetY = offsetY
+//
+//        if self.navigationBarOffsetY > 150 {
+//            self.updateNavigation(ratio: 1)
+//        } else if self.navigationBarOffsetY > 130  {
+//            self.updateNavigation(ratio: (offsetY / 44))
+//        } else {
+//            
+//            self.updateNavigation(ratio: 0)
+//        }
         
     }
     
@@ -352,7 +412,8 @@ extension ViewPager: UIPageViewControllerDelegate {
 
 
 extension ViewPager: UIScrollViewDelegate {
-    
+
+
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.x == self.view.frame.width || self.isTapMenuItem {
             return
