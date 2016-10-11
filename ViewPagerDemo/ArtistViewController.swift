@@ -139,6 +139,18 @@ class ArtistViewController: UITableViewController {
         print(self.parent?.parent)
     }
     
+//    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        self.viewPagerController.startScroll()
+//    }
+//    
+//    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//        self.viewPagerController.endScroll()
+//    }
+//    
+//    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        self.viewPagerController.defaultPosition()
+//    }
+    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         self.viewPagerController.updateScrollViewOffset(scrollView: scrollView)

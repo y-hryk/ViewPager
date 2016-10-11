@@ -51,6 +51,8 @@ open class ViewPager: UIViewController {
     fileprivate var beforeOffsetY : CGFloat = 0.0
     fileprivate var navigationHiddenRatio : CGFloat = 0.0
     
+    fileprivate var isNavigationScrolling = false
+    
     override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -218,115 +220,81 @@ open class ViewPager: UIViewController {
         
         
         let offsetY = scrollView.contentOffset.y + 104
+        self.beforeOffsetY = offsetY
         
         print("offsetY : \(offsetY)")
         print("scrollView.contentOffset.y : \(scrollView.contentOffset.y)")
         if offsetY <= 0 && self.navigationBarOffsetY > 0 {
             scrollView.contentOffset.y = -40 - 20
+            scrollView.layoutIfNeeded()
         }
         
     }
     
+    open func startScroll() {
+//        self.navigationHiddenRatio = 0.0
+        self.isNavigationScrolling = true
+    }
+    
+    open func endScroll() {
+        //        self.navigationHiddenRatio = 0.0
+        
+    }
+    
+    open func defaultPosition() {
+        self.isNavigationScrolling = false
+    }
+    
     open func updateScrollViewOffset(scrollView: UIScrollView) {
+     
         
-        if self.isDragging {
-            return;
-        }
         let offsetY = scrollView.contentOffset.y + 104
-        let ratio = fabs(offsetY) / 104
-        
-//        print(scrollView.contentOffset.y)
-//
-//        if offsetY <= 104 && offsetY >= 0 {
-//            self.navigationController?.navigationBar.frame.origin.y =  -(ratio * 44) + 20
-////            print(scrollView.contentOffset.y)
-//        } else {
-//            self.navigationController?.navigationBar.frame.origin.y = 20
-//        }
-//        if offsetY < 0 {
-//            self.navigationBarOffsetY = 0
-//        }
         
         
-        print(offsetY)
-        self.navigationBarOffsetY += offsetY - self.beforeOffsetY
-        
-        if offsetY > self.beforeOffsetY {
-            // 下に引っ張る
-//            print("scrollView.contentOffset.y \(scrollView.contentOffset.y)")
-            if offsetY > 0 && offsetY < (scrollView.contentSize.height - scrollView.frame.size.height + 104) {
-                self.navigationHiddenRatio += 1
-//                NSLog("offsetY \(offsetY) + 1")
+        if !self.isDragging && offsetY > 0 && offsetY < scrollView.contentSize.height - scrollView.frame.size.height + 104
+{
+            let delta: CGFloat = self.beforeOffsetY - offsetY;
+            let movePositionY = (self.navigationController?.navigationBar.frame.origin.y)! + delta
+            
+    let navigationFinalPosition: CGFloat = -44 + 20
+            let navigationDefaultPosition: CGFloat = 20
+            
+            let positionY: CGFloat = max(min(movePositionY, CGFloat(navigationDefaultPosition)), CGFloat(navigationFinalPosition))
+
+            self.navigationBarOffsetY = positionY
+
+            if positionY == navigationFinalPosition {
+                self.navigationBarOffsetY = 44
             }
-            
-//            if offsetY >= 50 {
-//                self.navigationHiddenRatio = 50
-//            }
-            
-        } else {
-            // 上に引っ張る
-            
-            if offsetY > 0 && offsetY < (scrollView.contentSize.height - scrollView.frame.size.height + 104) {
-                self.navigationHiddenRatio -= 1
-//                NSLog(">>>>>> offsetY \(offsetY) - 1")
+    
+            if positionY == navigationDefaultPosition {
+                self.navigationBarOffsetY = 0
             }
-            
-//            if offsetY >= scrollView.contentSize.height {
-//                self.navigationHiddenRatio = 50
-//            }
+    
+            self.updateNavigation(ratio: fabs(positionY - 20) / 44)
+    
+//            print(fabs(positionY - 20) / 44)
+//            self.updateNavigation(ratio: fabs(positionY) / 44)
         }
         
-//        if self.navigationHiddenRatio >= 50 {
-//            self.navigationHiddenRatio = 50
-//        }
-//
-      
-
         
-//        print(self.navigationHiddenRatio)
-//        print(self.navigationHiddenRatio)
+//        let margin: CGFloat = 0
+//        if (offsetY > 0 + margin) {
+//            if offsetY >= 44 + margin {
+//                self.updateNavigation(ratio: 1)
+//                self.navigationBarOffsetY = 44
+//                
+//            } else {
+//                self.updateNavigation(ratio: ((offsetY - margin) / 44))
+//                self.navigationBarOffsetY = offsetY
+//            }
+//        } else {
+//            self.updateNavigation(ratio: 0)
+//            self.navigationBarOffsetY = 0.0
+//        }
+
         
         self.beforeOffsetY = offsetY
-  
-//        if (self.navigationBarOffsetY > 0 + 0) {
-//            if (self.navigationBarOffsetY >= 44 + 0) {
-//                self.updateNavigation(ratio: 1)
-//            } else {
-//                self.updateNavigation(ratio: ((self.navigationBarOffsetY - 0) / 44))
-////                self.navigationBarOffsetY = offsetY
-//            }
-//        }
-//        else {
-//            self.updateNavigation(ratio: 0)
-////            navigationBarOffsetY = 0.0
-//        }
-        
-
-        
-        if (offsetY > 0) {
-            if (offsetY >= 44) {
-                self.updateNavigation(ratio: 1)
-                self.navigationBarOffsetY = 44
-            } else {
-                self.updateNavigation(ratio: (offsetY / 44))
-                self.navigationBarOffsetY = offsetY
-            }
-        } else {
-            self.updateNavigation(ratio: 0)
-            navigationBarOffsetY = 0.0
-        }
-        
-//        self.beforeOffsetY = offsetY
-//
-//        if self.navigationBarOffsetY > 150 {
-//            self.updateNavigation(ratio: 1)
-//        } else if self.navigationBarOffsetY > 130  {
-//            self.updateNavigation(ratio: (offsetY / 44))
-//        } else {
-//            
-//            self.updateNavigation(ratio: 0)
-//        }
-        
     }
     
     fileprivate func updateNavigation(ratio: CGFloat) {
