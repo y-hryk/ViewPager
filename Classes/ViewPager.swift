@@ -49,9 +49,6 @@ open class ViewPager: UIViewController {
     
     fileprivate var navigationBarOffsetY : CGFloat = 0.0
     fileprivate var beforeOffsetY : CGFloat = 0.0
-    fileprivate var navigationHiddenRatio : CGFloat = 0.0
-    
-    fileprivate var isNavigationScrolling = false
     
     override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -218,65 +215,65 @@ open class ViewPager: UIViewController {
     
     open func syncScrollViewOffset(scrollView: UIScrollView) {
         
+        let statusBarHeight: CGFloat = UIApplication.shared.statusBarFrame.height
+        let navigationBarHeight = self.navigationController?.navigationBar.frame.height ?? 0
+        let topInset = (statusBarHeight + navigationBarHeight + self.option.menuItemHeight)
         
-        let offsetY = scrollView.contentOffset.y + 104
+        let offsetY = scrollView.contentOffset.y + topInset
         self.beforeOffsetY = offsetY
         
-        print("offsetY : \(offsetY)")
-        print("scrollView.contentOffset.y : \(scrollView.contentOffset.y)")
         if offsetY <= 0 && self.navigationBarOffsetY > 0 {
-            scrollView.contentOffset.y = -40 - 20
+            scrollView.contentOffset.y = statusBarHeight - navigationBarHeight
             scrollView.layoutIfNeeded()
         }
         
+        if offsetY == topInset - (statusBarHeight + navigationBarHeight) && self.navigationBarOffsetY == 0 {
+            scrollView.contentOffset.y = -topInset
+            scrollView.layoutIfNeeded()
+
+        }
     }
     
     open func startScroll() {
-//        self.navigationHiddenRatio = 0.0
-        self.isNavigationScrolling = true
     }
     
     open func endScroll() {
-        //        self.navigationHiddenRatio = 0.0
-        
+
     }
     
     open func defaultPosition() {
-        self.isNavigationScrolling = false
     }
     
     open func updateScrollViewOffset(scrollView: UIScrollView) {
      
+        let statusBarHeight: CGFloat = UIApplication.shared.statusBarFrame.height
+        let navigationBarHeight = self.navigationController?.navigationBar.frame.height ?? 0
+        let topInset = (statusBarHeight + navigationBarHeight + self.option.menuItemHeight)
         
-        let offsetY = scrollView.contentOffset.y + 104
+        let offsetY = scrollView.contentOffset.y + topInset
         
-        
-        if !self.isDragging && offsetY > 0 && offsetY < scrollView.contentSize.height - scrollView.frame.size.height + 104
-{
-            let delta: CGFloat = self.beforeOffsetY - offsetY;
-            let movePositionY = (self.navigationController?.navigationBar.frame.origin.y)! + delta
+        if !self.isDragging && offsetY > 0 && offsetY < scrollView.contentSize.height - scrollView.frame.size.height + topInset {
+            let scrollDiff: CGFloat = self.beforeOffsetY - offsetY;
+            let movePositionY = (self.navigationController?.navigationBar.frame.origin.y)! + scrollDiff
             
-    let navigationFinalPosition: CGFloat = -44 + 20
-            let navigationDefaultPosition: CGFloat = 20
+            let navigationFinalPosition: CGFloat = -navigationBarHeight + statusBarHeight
+            let navigationDefaultPosition: CGFloat = statusBarHeight
             
             let positionY: CGFloat = max(min(movePositionY, CGFloat(navigationDefaultPosition)), CGFloat(navigationFinalPosition))
 
             self.navigationBarOffsetY = positionY
 
             if positionY == navigationFinalPosition {
-                self.navigationBarOffsetY = 44
+                self.navigationBarOffsetY = navigationBarHeight
             }
     
             if positionY == navigationDefaultPosition {
                 self.navigationBarOffsetY = 0
             }
     
-            self.updateNavigation(ratio: fabs(positionY - 20) / 44)
+            self.updateNavigation(ratio: fabs(positionY - statusBarHeight) / navigationBarHeight)
     
-//            print(fabs(positionY - 20) / 44)
-//            self.updateNavigation(ratio: fabs(positionY) / 44)
         }
-        
         
 //        let margin: CGFloat = 0
 //        if (offsetY > 0 + margin) {
@@ -293,14 +290,15 @@ open class ViewPager: UIViewController {
 //            self.navigationBarOffsetY = 0.0
 //        }
 
-        
         self.beforeOffsetY = offsetY
     }
     
     fileprivate func updateNavigation(ratio: CGFloat) {
         
-        self.navigationController?.navigationBar.transform = CGAffineTransform(translationX: 0, y: ratio * -44)
-        self.menuView.transform = CGAffineTransform(translationX: 0, y: ratio * -44)
+        let navigationBarHeight = self.navigationController?.navigationBar.frame.height ?? 0
+        
+        self.navigationController?.navigationBar.transform = CGAffineTransform(translationX: 0, y: ratio * -navigationBarHeight)
+        self.menuView.transform = CGAffineTransform(translationX: 0, y: ratio * -navigationBarHeight)
         
         
         let alphaRatio = 1 - ratio
@@ -310,7 +308,6 @@ open class ViewPager: UIViewController {
             if NSStringFromClass(type(of: $0)) != "_UINavigationBarBackground" {
                 $0.alpha = alphaRatio
             }
-
         })
     }
 }
@@ -354,7 +351,6 @@ extension ViewPager: UIPageViewControllerDataSource {
 }
 
 // MARK: - UIPageViewControllerDelegate
-
 extension ViewPager: UIPageViewControllerDelegate {
     
     public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
@@ -378,9 +374,8 @@ extension ViewPager: UIPageViewControllerDelegate {
 }
 
 
-
+// MARK: - UIScrollViewDelegate
 extension ViewPager: UIScrollViewDelegate {
-
 
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.x == self.view.frame.width || self.isTapMenuItem {
@@ -436,11 +431,11 @@ extension ViewPager: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        
     }
 
 }
 
+// MARK: - MenuViewDelegate
 extension ViewPager: MenuViewDelegate {
     public func menuViewDidTapMeunItem(index: Int, direction: UIPageViewControllerNavigationDirection) {
         self.viewPagerWillBeginDraggingHandler?(self)
