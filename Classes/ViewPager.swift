@@ -222,15 +222,16 @@ open class ViewPager: UIViewController {
         let offsetY = scrollView.contentOffset.y + topInset
         self.beforeOffsetY = offsetY
         
-        if offsetY <= 0 && self.navigationBarOffsetY > 0 {
-            scrollView.contentOffset.y = statusBarHeight - navigationBarHeight
-            scrollView.layoutIfNeeded()
-        }
+//        if offsetY <= 0 && self.navigationBarOffsetY > 0 {
+//            scrollView.contentOffset.y = -statusBarHeight - self.navigationBarOffsetY
+//            scrollView.layoutIfNeeded()
+//        }
         
-        if offsetY == topInset - (statusBarHeight + navigationBarHeight) && self.navigationBarOffsetY == 0 {
-            scrollView.contentOffset.y = -topInset
-            scrollView.layoutIfNeeded()
+        let hiddenRidio = self.navigationBarOffsetY / navigationBarHeight
 
+        if scrollView.contentOffset.y >= -topInset && scrollView.contentOffset.y <= -(topInset - navigationBarHeight) {
+            scrollView.contentOffset.y = -topInset + (hiddenRidio * (navigationBarHeight))
+            scrollView.layoutIfNeeded()
         }
     }
     
@@ -261,18 +262,21 @@ open class ViewPager: UIViewController {
             
             let positionY: CGFloat = max(min(movePositionY, CGFloat(navigationDefaultPosition)), CGFloat(navigationFinalPosition))
 
-            self.navigationBarOffsetY = positionY
-
-            if positionY == navigationFinalPosition {
-                self.navigationBarOffsetY = navigationBarHeight
-            }
+//            self.navigationBarOffsetY = positionY
+//            
+//            print(">>>>>>>> \(fabs(positionY - statusBarHeight) / navigationBarHeight)")
+//
+//            if positionY == navigationFinalPosition {
+//                self.navigationBarOffsetY = navigationBarHeight
+//            }
+//    
+//            if positionY == navigationDefaultPosition {
+//                self.navigationBarOffsetY = 0
+//            }
+            let navigationRatio = fabs(positionY - statusBarHeight) / navigationBarHeight
     
-            if positionY == navigationDefaultPosition {
-                self.navigationBarOffsetY = 0
-            }
-    
-            self.updateNavigation(ratio: fabs(positionY - statusBarHeight) / navigationBarHeight)
-    
+            self.navigationBarOffsetY = navigationRatio * navigationBarHeight
+            self.updateNavigation(ratio: navigationRatio)
         }
         
 //        let margin: CGFloat = 0
