@@ -277,6 +277,13 @@ open class MenuView: UIView {
     }
     
     // MARK: Public
+    
+    open func reloadItems() {
+        self.collectionView.reloadData()
+        self.currentIndicatorPointX = 0
+        self.currentOffsetX = 0
+    }
+    
     open func scrollToMenuItemAtIndex(index: Int) {
         
         self.currentIndex = self.option.pagerType.isInfinity() ? index + self.titles.count : index
@@ -449,6 +456,7 @@ extension MenuView: UICollectionViewDelegate {
             self.option.menuItemWidth = self.frame.size.width / CGFloat(self.titles.count)
         }
         let width = MenuCell.cellWidth(self.titles[index], option: self.option)
+    
         return CGSize(width: width, height: self.frame.height)
     }
     

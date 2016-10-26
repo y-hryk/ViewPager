@@ -90,6 +90,11 @@ open class ViewPager: UIViewController {
         }
     }
     
+    open override func viewDidLayoutSubviews() {
+        self.menuView.reloadItems()
+        self.menuView.scrollToMenuItemAtIndex(index: self.currentIndex)
+    }
+    
     override open func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
