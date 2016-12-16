@@ -134,6 +134,7 @@ class ArtistViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let vc = UIViewController()
+        vc.view.backgroundColor = UIColor.white
         self.navigationController?.pushViewController(vc, animated: true)
         
         print(self.parent?.parent)

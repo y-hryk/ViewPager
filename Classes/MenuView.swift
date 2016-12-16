@@ -411,26 +411,6 @@ extension MenuView : UICollectionViewDataSource {
 // MARK: UICollectionViewDelegate
 extension MenuView: UICollectionViewDelegate {
     
-    
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        print("\(scrollView.contentOffset.x)")
-        if self.option.pagerType.isInfinity() {
-            if self.contentWidth == 0.0 {
-                self.contentWidth = floor(scrollView.contentSize.width / self.factor)
-            }
-            
-            if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.contentWidth * 2.0) {
-                scrollView.contentOffset.x = self.contentWidth
-            }
-        }
-    }
-    
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.indicatorView.isHidden = true
-        self.collectionView.reloadData()
-        self.delegate?.menuViewWillBeginDragging(scrollView: scrollView)
-    }
-    
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         self.delegate?.menuViewDidEndDragging(scrollView: scrollView)
     }
@@ -470,5 +450,32 @@ extension MenuView: UICollectionViewDelegate {
         
         self.scrollToMenuItemAtIndexUserTap(indexPath: indexPath, animated: true)
     }
-    
+
 }
+
+
+// MARK: UIScrollViewDelegate
+extension MenuView: UIScrollViewDelegate {
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        //        print("\(scrollView.contentOffset.x)")
+        if self.option.pagerType.isInfinity() {
+            if self.contentWidth == 0.0 {
+                self.contentWidth = floor(scrollView.contentSize.width / self.factor)
+            }
+            
+            if (scrollView.contentOffset.x <= 0.0) || (scrollView.contentOffset.x > self.contentWidth * 2.0) {
+                scrollView.contentOffset.x = self.contentWidth
+            }
+        }
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.indicatorView.isHidden = true
+        self.collectionView.reloadData()
+        self.delegate?.menuViewWillBeginDragging(scrollView: scrollView)
+    }
+}
+
+
+

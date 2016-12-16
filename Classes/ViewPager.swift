@@ -77,11 +77,10 @@ open class ViewPager: UIViewController {
     }
     
     open override func viewWillAppear(_ animated: Bool) {
-//        print("viewWillAppear")
+
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
-//        print("viewWillDisappear")
         
         if let originY = self.navigationController?.navigationBar.frame.origin.y {
             if originY < 0.0 {
